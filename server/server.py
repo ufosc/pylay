@@ -1,13 +1,11 @@
 import sys
 
-from common.hostmask import *
+from common.message import *
 
 line = sys.stdin.readline()
 
-hs = hostmask(line)
-if hs is None:
-	print("invalid hostname {}".format(line))
-else:
-	print("nick: {}".format(hs.nick))
-	print("user: {}".format(hs.user))
-	print("hostt: {}".format(hs.host))
+msg = message(line)
+
+print(msg.command)
+for arg in msg.arguments:
+	print(arg)
