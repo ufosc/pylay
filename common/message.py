@@ -47,6 +47,38 @@ class Message:
 			# Add it to the list, ignoring its escape character ":"
 			self._arguments.append(escaped[1:])
 
+	def __format__(self, spec):
+		"""
+		Format a message as it would be sent to a client or server.
+		A message consists of an optional source, a command, and arguments.
+
+		:param spec: The character encoding. Unused.
+		:return: The message formatted as a string.
+		"""
+
+		# Accumlate the individual parts of the message
+		result = ""
+
+		# The source is optional
+		if self._source is not None:
+			src = format(self._source)
+			# When the source exists, it is always prepended by a ':'
+			result += ":{} ".format(src)
+
+		# The command always exists
+		result += "{} ".format(self._command)
+		# Concat all arguments but the last (may need escaping)
+		if len(self._arguments[:-1]) > 0:
+			result += "{} ".format(' '.join(self._arguments[:-1]))
+
+		# If the last argument has a space, it must be escaped with ':'
+		if ' ' in self._arguments[-1]:
+			result += ":{}".format(self._arguments[-1])
+		else:
+			result += "{}".format(self._arguments[-1])
+
+		return result
+
 	@property
 	def source(self):
 		return self._source

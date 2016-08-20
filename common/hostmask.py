@@ -26,6 +26,17 @@ class Hostmask:
 			self._user = result.group(2)
 			self._host = result.group(3)
 
+	def __format__(self, spec):
+		"""
+		Format a hostmask as how it will be seen in a message.
+		The parts of a hostmask are separated by '!' and '@'.
+
+		:param spec: The character encoding. Unused.
+		:return: The hostmask formatted as a string.
+		"""
+
+		return "{}!{}@{}".format(self._nick, self._user, self._host)
+
 	@property
 	def nick(self):
 		return self._nick
