@@ -2,13 +2,25 @@ import re
 
 class hostmask:
 
-	def __init__(self, raw):
-		result = re.search("^(.{1,9})!([^@]+)@(.+)$", raw)
-		assert result is not None
 
-		self._nick = regex.group(1)
-		self._user = regex.group(2)
-		self._host = regex.group(3)
+	def __init__(self, raw):
+		"""
+		Get information about a source.
+		This information is usually the first part of a message from a server,
+		and contains the nick, user, and host names.
+
+		:param raw: The string to parse.
+		:return: None
+		"""
+
+		result = re.search("^(.{1,9})!([^@]+)@(.+)$", raw)
+
+		if result is None:
+			raise ValueError('bad hostmask format')
+		else:
+			self._nick = result.group(1)
+			self._user = result.group(2)
+			self._host = result.group(3)
 
 	@property
 	def nick(self):
