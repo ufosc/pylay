@@ -30,3 +30,11 @@ class message:
 	@property
 	def source(self):
 		return self._source
+
+	@property
+	def command(self):
+		return self._command
+
+	@property
+	def parameters(self):
+		return self._parameters
