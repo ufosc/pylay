@@ -24,7 +24,7 @@ class Reply:
 			raise ValueError('message has no command')
 
 		# A reply command is just a 3-digit code
-		cmd  = int(parts[0])
-		args = Message.parse_arguments(parts[1:])
+		cmd = int(parts[0])
+		arg = ' '.join(parts[1:])
 
-		Message.__init__(self, pre, cmd, args)
+		Message.__init__(self, pre, cmd, arg)

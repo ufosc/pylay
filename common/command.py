@@ -28,6 +28,6 @@ class Command(Message):
 
 		cmd = parts[0]
 		# Every 'part' after the command is an argument
-		args = Message.parse_arguments(parts[1:])
+		arg = ' '.join(parts[1:])
 
-		Message.__init__(self, pre, cmd, args)
+		Message.__init__(self, pre, cmd, arg)

@@ -15,24 +15,28 @@ class Message:
 
 		return raw.startswith(':')
 
-	@staticmethod
-	def parse_arguments(parts):
+	def __init__(self, pre, cmd, arg):
 		"""
-		Parse an list of strings into a proper list of message arguments.
-		Searches for an argument starting with ':' and concats the remaining.
+		Create a new message with the given parts
 
-		:param parts: A list of strings, split on ' ', to parse.
-		:return: A list of arguments as they were originally formatted.
+		:param pre: The prefix of the message, or None.
+		:param cmd: The main command (an all-caps name or a code).
+		:param arg: The remaining arguments as a single string.
+		:return: None
 		"""
 
-		args = []
+		self._prefix = pre
+		self._command = cmd
+		self._arguments = []
+
+		parts = arg.split()
 		while parts:
 			# An argument starting with ":" means the remaining portion of the
 			# message is intended to be parsed as a single argument
 			if parts[0].startswith(':'):
 				break
 			else:
-				args.append(parts.pop(0))
+				self._arguments.append(parts.pop(0))
 
 		# The previous while loop must have invoked "break"
 		# This means there is an escaped argument in this message
@@ -40,23 +44,7 @@ class Message:
 			# Recreate the original format of the argument
 			escaped = ' '.join(parts)
 			# Add it to the list, ignoring its escape character ":"
-			args.append(escaped[1:])
-
-		return args
-
-	def __init__(self, pre, cmd, args):
-		"""
-		Create a new message with the given parts
-
-		:param pre:  The prefix of the message, or None.
-		:param cmd:  The main command (an all-caps name or a code).
-		:param args: The arguments of the message.
-		:return: None
-		"""
-
-		self._prefix = pre
-		self._command = cmd
-		self._arguments = args
+			self._arguments.append(escaped[1:])
 
 	def __format__(self, spec):
 		"""
