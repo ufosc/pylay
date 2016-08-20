@@ -1,0 +1,33 @@
+from message import *
+from hostmask import *
+
+class Command(Message):
+	"""
+	An IRC command sent by a client.
+	"""
+
+	def __init__(self, raw):
+		"""
+		Create a command representation by parsing a raw received message.
+		Use functionality from Message, then create a Hostmask from the prefix.
+
+		:param raw: The full message in string form.
+		:return: None
+		"""
+
+		parts = raw.split()
+
+		pre = None
+		if Message.has_prefix(raw):
+			# Create a hostmask from the prefix, ignoring the ':' at the start
+			pre = Hostmask(parts[0][1:])
+			del parts[0]
+
+		if len(parts) == 0:
+			raise ValueError('message has no command')
+
+		cmd = parts[0]
+		# Every 'part' after the command is an argument
+		args = Message.parse_arguments(parts[1:])
+
+		Message.__init__(self, pre, cmd, args)

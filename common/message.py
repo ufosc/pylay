@@ -1,43 +1,38 @@
-from hostmask import *
-
 class Message:
+	"""
+	A generic IRC message from a client or server.
+	"""
 
-	def __init__(self, raw):
+	@staticmethod
+	def has_prefix(raw):
 		"""
-		Parse a complete IRC message into its constituents.
-		Break a message into its source, command, and arguments (if any).
+		Check if a message contains a prefixed server/client source.
+		The message prefix is optional, and usually present only for replies.
 
-		:param raw: The string to parse.
-		:return: None
+		:param raw: The message in string form.
+		:return: A boolean representing whether or not a prefix exists.
 		"""
 
-		# Each portion of a message is delimited by a space
-		# Except for the escaped last argument, which is dealt with later
-		parts = raw.split()
+		return raw.startswith(':')
 
-		# The source is optional - if it exists, it is prepended with a ":"
-		if parts[0].startswith(':'):
-			# Hostmask will parse the information from the source
-			self._source = Hostmask(parts[0][1:])
-			del parts[0]
-		else:
-			self._source = None
+	@staticmethod
+	def parse_arguments(parts):
+		"""
+		Parse an list of strings into a proper list of message arguments.
+		Searches for an argument starting with ':' and concats the remaining.
 
-		# All IRC messages must contain a command
-		if len(parts) == 0:
-			raise ValueError('message contains no command')
+		:param parts: A list of strings, split on ' ', to parse.
+		:return: A list of arguments as they were originally formatted.
+		"""
 
-		self._command = parts.pop(0)
-
-		# The remaining parts are the arguments
-		self._arguments = []
+		args = []
 		while parts:
 			# An argument starting with ":" means the remaining portion of the
 			# message is intended to be parsed as a single argument
 			if parts[0].startswith(':'):
 				break
 			else:
-				self._arguments.append(parts.pop(0))
+				args.append(parts.pop(0))
 
 		# The previous while loop must have invoked "break"
 		# This means there is an escaped argument in this message
@@ -45,12 +40,27 @@ class Message:
 			# Recreate the original format of the argument
 			escaped = ' '.join(parts)
 			# Add it to the list, ignoring its escape character ":"
-			self._arguments.append(escaped[1:])
+			args.append(escaped[1:])
+
+		return args
+
+	def __init__(self, pre, cmd, args):
+		"""
+		Create a new message with the given parts
+
+		:param pre:  The prefix of the message, or None.
+		:param cmd:  The main command (an all-caps name or a code).
+		:param args: The arguments of the message.
+		:return: None
+		"""
+
+		self._prefix = pre
+		self._command = cmd
+		self._arguments = args
 
 	def __format__(self, spec):
 		"""
 		Format a message as it would be sent to a client or server.
-		A message consists of an optional source, a command, and arguments.
 
 		:param spec: The character encoding. Unused.
 		:return: The message formatted as a string.
@@ -59,9 +69,9 @@ class Message:
 		# Accumlate the individual parts of the message
 		result = ""
 
-		# The source is optional
-		if self._source is not None:
-			src = format(self._source)
+		# The prefix is optional
+		if self._prefix is not None:
+			src = format(self._prefix)
 			# When the source exists, it is always prepended by a ':'
 			result += ":{} ".format(src)
 
@@ -80,8 +90,8 @@ class Message:
 		return result
 
 	@property
-	def source(self):
-		return self._source
+	def prefix(self):
+		return self._prefix
 
 	@property
 	def command(self):
