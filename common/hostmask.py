@@ -1,6 +1,6 @@
 import re
 
-class hostmask:
+class Hostmask:
 
 
 	def __init__(self, raw):

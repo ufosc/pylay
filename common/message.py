@@ -1,6 +1,6 @@
 from hostmask import *
 
-class message:
+class Message:
 
 	def __init__(self, raw):
 		"""
@@ -17,8 +17,8 @@ class message:
 
 		# The source is optional - if it exists, it is prepended with a ":"
 		if parts[0].startswith(':'):
-			# hostmask will parse the information from the source
-			self._source = hostmask(parts[0][1:])
+			# Hostmask will parse the information from the source
+			self._source = Hostmask(parts[0][1:])
 			del parts[0]
 		else:
 			self._source = None
