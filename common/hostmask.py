@@ -13,6 +13,10 @@ class hostmask:
 		:return: None
 		"""
 
+		# Breakdown for parsing a hostmask:
+		# - ".{1,9}": get the nickname, which is at most 9 characters
+		# - "[^@]":   parse up to the host separator for the username
+		# - "(.+)":   parse to the end of the string for the hostname
 		result = re.search("^(.{1,9})!([^@]+)@(.+)$", raw)
 
 		if result is None:
