@@ -1,32 +1,45 @@
 from common.hostmask import *
 
-class User(object):
+class User:
+
+	def is_registered(self):
+		raise NotImplementedError
+
+class PendingUser(User):
 
 	def __init__(self, addr):
-		self._address  = addr
-		self._username = None
-		self._nickname = None
+		self.nickname = None
+		self.username = None
 
-	def make_hostmask(self):
-		if self._nickname is None or self._username is None:
-			return None
+		self._hostname = addr
 
-		(host, _) = self._address
-		return Hostmask(self._nickname, self._username, host)
+	def is_registered(self):
+		return False
 
-	@property
-	def username(self):
-		return self._username
+	def is_complete(self):
+		if self.nickname is None:
+			return False
+		if self.username is None:
+			return False
 
-	@username.setter
-	def username(self, u):
-		self._username = u
+		return True
 
 	@property
-	def nickname(self):
-		return self._nickname
+	def hostname(self):
+		return self._hostname
 
-	@nickname.setter
-	def nickname(self, n):
-		self._nickname = n
+class RegisteredUser(User):
 
+	@staticmethod
+	def from_pending(pu):
+		return RegisteredUser(pu.nickname, pu.username, pu.hostname)
+
+	def __init__(self, nick, user, host):
+		self._hostmask = Hostmask(nick, user, host)
+
+	def is_registered(self):
+		return True
+
+	@property
+	def hostmask(self):
+		return self._hostmask

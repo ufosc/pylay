@@ -8,10 +8,12 @@ class Server:
 
 	class Listener(Thread):
 
-		def __init__(self, conn):
+		def __init__(self, serv, addr, conn):
 			Thread.__init__(self)
-
 			self._connection = conn
+			self._address = addr
+
+			self._server = serv
 
 		def run(self):
 			while True:
@@ -20,6 +22,9 @@ class Server:
 					break
 
 				# handle the message
+
+	def __init__(self):
+		self._users = []
 
 	def start(self, ip, port):
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -30,5 +35,11 @@ class Server:
 			sock.listen(0)
 			(conn, addr) = sock.accept()
 
-			# create requesting user
-			Listener(conn).start()
+			(ip, _) = addr
+			self._users.append(PendingUser(ip))
+
+			Listener(self, addr, conn).start()
+
+	@property
+	def users(self):
+		return self._users
