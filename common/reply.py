@@ -3,6 +3,16 @@ class Reply:
 	An IRC reply sent by a server.
 	"""
 
+	class RPL:
+		"""
+		Constants for all RPL_* IRC message codes
+		"""
+
+		WELCOME  = 1
+		YOURHOST = 2
+		CREATED  = 3
+		MYINFO   = 4
+
 	def __init__(self, raw):
 		"""
 		Create a command representation by parsing a raw received message.

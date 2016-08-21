@@ -6,6 +6,13 @@ class Command(Message):
 	An IRC command sent by a client.
 	"""
 
+	NICK    = "NICK"
+	USER    = "USER"
+	JOIN    = "JOIN"
+	PRIVMSG = "PRIVMSG"
+	PART    = "PART"
+	QUIT    = "QUIT"
+
 	def __init__(self, raw):
 		"""
 		Create a command representation by parsing a raw received message.
