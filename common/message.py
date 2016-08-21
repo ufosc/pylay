@@ -15,19 +15,16 @@ class Message:
 
 		return raw.startswith(':')
 
-	def __init__(self, pre, cmd, arg):
+	@staticmethod
+	def parse_arguments(arg):
 		"""
-		Create a new message with the given parts
+		Split a single argument string into individual arguments.
 
-		:param pre: The prefix of the message, or None.
-		:param cmd: The main command (an all-caps name or a code).
-		:param arg: The remaining arguments as a single string.
-		:return: None
+		:param arg: The arguments as a single string.
+		:return: A list of arguments.
 		"""
 
-		self._prefix = pre
-		self._command = cmd
-		self._arguments = []
+		args = []
 
 		parts = arg.split()
 		while parts:
@@ -36,7 +33,7 @@ class Message:
 			if parts[0].startswith(':'):
 				break
 			else:
-				self._arguments.append(parts.pop(0))
+				args.append(parts.pop(0))
 
 		# The previous while loop must have invoked "break"
 		# This means there is an escaped argument in this message
@@ -44,7 +41,23 @@ class Message:
 			# Recreate the original format of the argument
 			escaped = ' '.join(parts)
 			# Add it to the list, ignoring its escape character ":"
-			self._arguments.append(escaped[1:])
+			args.append(escaped[1:])
+
+		return args
+
+	def __init__(self, pre, cmd, args):
+		"""
+		Create a new message with the given parts
+
+		:param pre: The prefix of the message, or None.
+		:param cmd: The main command (an all-caps name or a code).
+		:param arg: The arguments.
+		:return: None
+		"""
+
+		self._prefix = pre
+		self._command = cmd
+		self._arguments = args
 
 	def __format__(self, spec):
 		"""

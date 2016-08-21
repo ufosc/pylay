@@ -37,4 +37,4 @@ class Command(Message):
 		# Every 'part' after the command is an argument
 		arg = ' '.join(parts[1:])
 
-		Message.__init__(self, pre, cmd, arg)
+		Message.__init__(self, pre, cmd, Message.parse_arguments(arg))

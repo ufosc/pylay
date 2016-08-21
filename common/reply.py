@@ -49,4 +49,4 @@ class Reply:
 		cmd = int(parts[0])
 		arg = ' '.join(parts[1:])
 
-		Message.__init__(self, pre, cmd, arg)
+		Message.__init__(self, pre, cmd, Message.parse_arguments(arg))
