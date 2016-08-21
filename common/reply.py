@@ -1,4 +1,4 @@
-class Reply:
+class Reply(Message):
 	"""
 	An IRC reply sent by a server.
 	"""

@@ -1,6 +1,6 @@
 import re
 
-class Hostmask:
+class Hostmask(object):
 	"""
 	A unique identifier for a client.
 	This information is usually the first part of a message from a server, and

@@ -1,6 +1,6 @@
 from common.hostmask import *
 
-class User:
+class User(object):
 	"""
 	The common traits of a user, with or without all required information.
 	"""

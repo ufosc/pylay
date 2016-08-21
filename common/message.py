@@ -1,4 +1,4 @@
-class Message:
+class Message(object):
 	"""
 	A generic IRC message from a client or server.
 	"""
