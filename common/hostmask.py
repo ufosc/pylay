@@ -1,16 +1,19 @@
 import re
 
 class Hostmask:
+	"""
+	A unique identifier for a client.
+	This information is usually the first part of a message from a server, and
+	contains the nick, user, and host names.
+	"""
 
-
-	def __init__(self, raw):
+	@staticmethod
+	def from_raw(raw):
 		"""
-		Get information about a source.
-		This information is usually the first part of a message from a server,
-		and contains the nick, user, and host names.
+		Parse a hostmask as it is received from a message.
 
-		:param raw: The string to parse.
-		:return: None
+		:param raw: The hostmask, as a string.
+		:return: The constructed Hostmask, or None if invalid.
 		"""
 
 		# Breakdown for parsing a hostmask:
@@ -20,11 +23,23 @@ class Hostmask:
 		result = re.search("^(.{1,9})!([^@]+)@(.+)$", raw)
 
 		if result is None:
-			raise ValueError('bad hostmask format')
+			return None
 		else:
-			self._nick = result.group(1)
-			self._user = result.group(2)
-			self._host = result.group(3)
+			return Hostmask(result.group(1), result.group(2), result.group(3))
+
+	def __init__(self, n, u, h):
+		"""
+		Create a new hostmask with the given parts.
+
+		:param n: The nickname.
+		:param u: The username.
+		:param h: The hostname.
+		:return: None
+		"""
+
+		self._nick = n
+		self._user = u
+		self._host = h
 
 	def __format__(self, spec):
 		"""

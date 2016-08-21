@@ -27,7 +27,7 @@ class Command(Message):
 		pre = None
 		if Message.has_prefix(raw):
 			# Create a hostmask from the prefix, ignoring the ':' at the start
-			pre = Hostmask(parts[0][1:])
+			pre = Hostmask.from_raw(parts[0][1:])
 			del parts[0]
 
 		if len(parts) == 0:
