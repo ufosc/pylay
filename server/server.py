@@ -1,6 +1,5 @@
 import socket
 from threading import Thread
-from SocketServer import ThreadingMixIn
 
 from user import *
 from common.command import *
@@ -100,14 +99,13 @@ class Server(object):
 			# Listen with no queued connections - will block
 			sock.listen(0)
 			# A connection has been acquired - get its info
-			(conn, addr) = sock.accept()
+			(conn, (ip, _)) = sock.accept()
 
-			(ip, _) = addr
 			# All users are pending until the nick and host info is sent
 			self._users[ip] = PendingUser(ip)
 
 			# Begin waiting for data from this client
-			Server.Listener(self, addr, conn).start()
+			Server.Listener(self, ip, conn).start()
 
 	def handle_message(self, source, data):
 		"""
@@ -119,17 +117,20 @@ class Server(object):
 		:return: True, if the connection should now close; False otherwise.
 		"""
 
-		(ip, _) = source.address
-		usr = self._users[ip]
+		usr = self._users[source.address]
 		res = None
 
 		msg = Command(data)
 		if msg.command == Command.QUIT:
-			self._users.pop(ip)
+			self._users.pop(source.address)
 			return True
 
 		elif msg.command == Command.NICK:
 			res = self.update_nickname(usr, *msg.arguments)
+			self.try_register(source, usr)
+		elif msg.command == Command.USER:
+			res = self.set_username(usr, *msg.arguments)
+			self.try_register(source, usr)
 
 		else:
 			res = Message(self._hostname, Reply.ERR.UNKNOWNCOMMAND, [
@@ -156,6 +157,24 @@ class Server(object):
 
 		usr.nickname = nick
 		return None
+
+	def set_username(self, usr, name, host, serv, real):
+		if usr.is_registered() or usr.username is not None:
+			return Message(self._hostname, Reply.ERR.ALREADYREGISTERED, [
+				'unauthorized command (already registered)'
+			])
+
+		usr.username = name
+		return None
+
+	def try_register(self, source, usr):
+		if usr.is_registered() or not usr.is_complete():
+			return
+
+		usr = self._users[source.address] = RegisteredUser.from_pending(usr)
+		source.send(format(Message(self._hostname, Reply.RPL.WELCOME, [
+			'welcome to pylay IRC ' + format(usr.hostmask)
+		])))
 
 	@property
 	def users(self):

@@ -21,11 +21,14 @@ class Reply(Message):
 		"""
 
 		UNKNOWNCOMMAND = 421
+		NEEDMOREPARAMS = 461
 
 		NONICKNAMEGIVEN  = 431
 		ERRONEUSNICKNAME = 432
 		NICKNAMEINUSE    = 433
 		NICKCOLLISION    = 436
+
+		ALREADYREGISTERED = 462
 
 	def __init__(self, raw):
 		"""
