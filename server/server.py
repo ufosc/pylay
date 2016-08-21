@@ -125,10 +125,11 @@ class Server(object):
 
 		msg = Command(data)
 		if msg.command == Command.QUIT:
+			self._users.pop(ip)
 			return True
 
 		elif msg.command == Command.NICK:
-			res = self.set_nickname(usr, *msg.arguments)
+			res = self.update_nickname(usr, *msg.arguments)
 
 		else:
 			res = Message(self._hostname, Reply.ERR.UNKNOWNCOMMAND, [
@@ -141,7 +142,19 @@ class Server(object):
 		# Most normal commands do not end with finishing the connection
 		return False
 
-	def set_nickname(self, usr, nick):
+	def update_nickname(self, usr, nick):
+		if (len(nick) > 9):
+			return Message(self._hostname, Reply.ERR.ERRONEUSNICKNAME, [
+				nick, 'erroneous nickname'
+			])
+
+		search = (u for (_, u) in self._users.items() if u.nickname == nick)
+		if next(search, None) is not None:
+			return Message(self._hostname, Reply.ERR.NICKNAMEINUSE, [
+				nick, 'nickname is already in use'
+			])
+
+		usr.nickname = nick
 		return None
 
 	@property
