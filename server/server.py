@@ -3,6 +3,7 @@ from threading import Thread
 from SocketServer import ThreadingMixIn
 
 from user import *
+from common.command import *
 
 class Server:
 
@@ -21,10 +22,18 @@ class Server:
 				if not data:
 					break
 
-				# handle the message
+				done = self._server.handle_message(self, data)
+				if done:
+					break
+
+			self._connection.close()
+
+		@property
+		def address(self):
+			return self._address
 
 	def __init__(self):
-		self._users = []
+		self._users = {}
 
 	def start(self, ip, port):
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -36,9 +45,19 @@ class Server:
 			(conn, addr) = sock.accept()
 
 			(ip, _) = addr
-			self._users.append(PendingUser(ip))
+			self._users[ip] = PendingUser(ip)
 
-			Listener(self, addr, conn).start()
+			Server.Listener(self, addr, conn).start()
+
+	def handle_message(self, source, data):
+		(ip, _) = source.address
+		usr = self._users[ip]
+
+		msg = Command(data)
+		if (msg.command == Command.QUIT):
+			return True
+
+		return False
 
 	@property
 	def users(self):
