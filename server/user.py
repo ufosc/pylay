@@ -15,6 +15,14 @@ class User(object):
 
 		raise NotImplementedError
 
+	@property
+	def nickname(self):
+		raise NotImplementedError
+
+	@nickname.setter
+	def nickname(self, nick):
+		raise NotImplementedError
+
 class PendingUser(User):
 	"""
 	The initial state of a user.
@@ -94,3 +102,11 @@ class RegisteredUser(User):
 	@property
 	def hostmask(self):
 		return self._hostmask
+
+	@property
+	def nickname(self):
+		return self._hostmask.nickname
+
+	@nickname.setter
+	def nickname(self, nick):
+		self._hostmask.nickname = nick
