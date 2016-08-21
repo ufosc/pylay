@@ -30,7 +30,7 @@ class PendingUser(User):
 		:return: None
 		"""
 
-		User.__init__(self)
+		#User.__init__(self)
 		self._hostname = addr
 
 		self.nickname = None
@@ -85,7 +85,7 @@ class RegisteredUser(User):
 		:return: None
 		"""
 
-		User.__init__(self)
+		#User.__init__(self)
 		self._hostmask = Hostmask(nick, user, host)
 
 	def is_registered(self):

@@ -4,6 +4,7 @@ from SocketServer import ThreadingMixIn
 
 from user import *
 from common.command import *
+from common.reply import *
 
 class Server:
 	"""
@@ -55,6 +56,17 @@ class Server:
 			# Explicitly finish the connection - any remaining data will be sent
 			self._connection.close()
 
+		def send(self, data):
+			"""
+			Send some data back to the client.
+			Guaranteed to send all data.
+
+			:param data: The data to send.
+			:return: None
+			"""
+
+			self._connection.sendall(data)
+
 		@property
 		def address(self):
 			return self._address
@@ -67,6 +79,7 @@ class Server:
 		"""
 
 		self._users = {}
+		self._hostname = None
 
 	def start(self, ip, port):
 		"""
@@ -80,7 +93,9 @@ class Server:
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
 
+		self._hostname = ip
 		sock.bind((ip, port))
+
 		while True:
 			# Listen with no queued connections - will block
 			sock.listen(0)
@@ -110,6 +125,13 @@ class Server:
 		msg = Command(data)
 		if (msg.command == Command.QUIT):
 			return True
+
+		else:
+			res = Message(self._hostname, Reply.ERR.UNKNOWNCOMMAND, [
+				msg.command, 'unknown command'
+			])
+
+			source.send(format(res))
 
 		# Most normal commands do not end with finishing the connection
 		return False
