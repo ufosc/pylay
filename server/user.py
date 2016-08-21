@@ -41,8 +41,8 @@ class PendingUser(User):
 		#User.__init__(self)
 		self._hostname = addr
 
-		self.nickname = None
-		self.username = None
+		self._nickname = None
+		self._username = None
 
 	def is_registered(self):
 		return False
@@ -55,16 +55,32 @@ class PendingUser(User):
 		:return: A boolean representing whether or not the user is complete.
 		"""
 
-		if self.nickname is None:
+		if self._nickname is None:
 			return False
-		if self.username is None:
+		if self._username is None:
 			return False
 
 		return True
 
 	@property
+	def username(self):
+		return self._username
+
+	@username.setter
+	def username(self, u):
+		self._username = u
+
+	@property
 	def hostname(self):
 		return self._hostname
+
+	@property
+	def nickname(self):
+		return self._nickname
+
+	@nickname.setter
+	def nickname(self, nick):
+		self._nickname = nick
 
 class RegisteredUser(User):
 	"""
