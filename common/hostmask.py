@@ -27,19 +27,19 @@ class Hostmask(object):
 		else:
 			return Hostmask(result.group(1), result.group(2), result.group(3))
 
-	def __init__(self, n, u, h):
+	def __init__(self, nick, user, host):
 		"""
 		Create a new hostmask with the given parts.
 
-		:param n: The nickname.
-		:param u: The username.
-		:param h: The hostname.
+		:param nick: The nickname.
+		:param user: The username.
+		:param host: The hostname.
 		:return: None
 		"""
 
-		self._nick = n
-		self._user = u
-		self._host = h
+		self._nickname = nick
+		self._username = user
+		self._hostname = host
 
 	def __format__(self, spec):
 		"""
@@ -50,16 +50,20 @@ class Hostmask(object):
 		:return: The hostmask formatted as a string.
 		"""
 
-		return "{}!{}@{}".format(self._nick, self._user, self._host)
+		return "{}!{}@{}".format(self._nickname, self._username, self._hostname)
 
 	@property
-	def nick(self):
-		return self._nick
+	def nickname(self):
+		return self._nickname
+
+	@nickname.setter
+	def nickname(self, nick):
+		self._nickname = nick
 
 	@property
-	def user(self):
-		return self._user
+	def username(self):
+		return self._username
 
 	@property
-	def host(self):
-		return self._host
+	def hostname(self):
+		return self._hostname
