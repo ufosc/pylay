@@ -1,3 +1,5 @@
+from message import *
+
 class Reply(Message):
 	"""
 	An IRC reply sent by a server.

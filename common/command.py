@@ -22,7 +22,8 @@ class Command(Message):
 		:return: None
 		"""
 
-		parts = raw.split()
+		# Ignore the CRLF
+		parts = raw[:-2].split()
 
 		pre = None
 		if Message.has_prefix(raw):

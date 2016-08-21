@@ -88,7 +88,7 @@ class Message(object):
 		else:
 			result += "{}".format(self._arguments[-1])
 
-		return result
+		return (result + '\r\n')
 
 	@property
 	def prefix(self):
