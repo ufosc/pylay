@@ -6,7 +6,7 @@ from user import *
 from common.command import *
 from common.reply import *
 
-class Server:
+class Server(object):
 	"""
 	An instance of an IRC server.
 	Manages users and channels, and handles received messages.
@@ -121,20 +121,28 @@ class Server:
 
 		(ip, _) = source.address
 		usr = self._users[ip]
+		res = None
 
 		msg = Command(data)
-		if (msg.command == Command.QUIT):
+		if msg.command == Command.QUIT:
 			return True
+
+		elif msg.command == Command.NICK:
+			res = self.set_nickname(usr, *msg.arguments)
 
 		else:
 			res = Message(self._hostname, Reply.ERR.UNKNOWNCOMMAND, [
 				msg.command, 'unknown command'
 			])
 
+		if res is not None:
 			source.send(format(res))
 
 		# Most normal commands do not end with finishing the connection
 		return False
+
+	def set_nickname(self, usr, nick):
+		return None
 
 	@property
 	def users(self):
