@@ -5,13 +5,25 @@ class Reply:
 
 	class RPL:
 		"""
-		Constants for all RPL_* IRC message codes
+		Constants for all RPL_* IRC message codes.
 		"""
 
 		WELCOME  = 1
 		YOURHOST = 2
 		CREATED  = 3
 		MYINFO   = 4
+
+	class ERR:
+		"""
+		Constants for all ERR_* IRC message codes.
+		"""
+
+		UNKNOWNCOMMAND = 421
+
+		NONICKNAMEGIVEN  = 431
+		ERRONEUSNICKNAME = 432
+		NICKNAMEINUSE    = 433
+		NICKCOLLISION    = 436
 
 	def __init__(self, raw):
 		"""
