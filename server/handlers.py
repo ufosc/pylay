@@ -1,6 +1,7 @@
 from server import *
 from user import *
 from common.reply import *
+from common.command import *
 
 class Handlers:
 
@@ -27,4 +28,16 @@ class Handlers:
 			])
 
 		usr.username = n
+		return None
+
+	@staticmethod
+	def privmsg(serv, usr, n, m):
+		target = serv.find_user(n)
+		if target is None:
+			return Message(serv.hostname, Reply.ERR.NOSUCHNICK, [
+				n, 'no such nickname'
+			])
+
+		msg = Message(usr.hostmask, Command.PRIVMSG, [n, m])
+		target[1].send(format(msg))
 		return None

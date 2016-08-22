@@ -124,9 +124,11 @@ class Server(object):
 			return True
 
 		elif msg.command == Command.NICK:
-			Handlers.nick(self, usr, *msg.arguments)
+			res = Handlers.nick(self, usr, *msg.arguments)
 		elif msg.command == Command.USER:
-			Handlers.user(self, usr, *msg.arguments)
+			res = Handlers.user(self, usr, *msg.arguments)
+		elif msg.command == Command.PRIVMSG:
+			res = Handlers.privmsg(self, usr, *msg.arguments)
 
 		else:
 			res = Message(self._hostname, Reply.ERR.UNKNOWNCOMMAND, [
@@ -145,7 +147,7 @@ class Server(object):
 
 	def find_user(self, nick):
 		ulist  = self._users.items()
-		result = next(p for p in ulist if p[1].nickname == n, None)
+		result = next((p for p in ulist if p[1].nickname == nick), None)
 
 		if result is None:
 			return None
@@ -166,5 +168,5 @@ class Server(object):
 		return self._users
 
 	@property
-	def hostmask(self):
-		return self._hostmask
+	def hostname(self):
+		return self._hostname
