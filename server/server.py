@@ -2,6 +2,7 @@ import socket
 from threading import Thread
 
 from user import *
+from handlers import *
 from common.command import *
 from common.reply import *
 
@@ -123,11 +124,9 @@ class Server(object):
 			return True
 
 		elif msg.command == Command.NICK:
-			res = self.update_nickname(usr, *msg.arguments)
-			self.try_register(source, usr)
+			Handlers.nick(self, usr, *msg.arguments)
 		elif msg.command == Command.USER:
-			res = self.set_username(usr, *msg.arguments)
-			self.try_register(source, usr)
+			Handlers.user(self, usr, *msg.arguments)
 
 		else:
 			res = Message(self._hostname, Reply.ERR.UNKNOWNCOMMAND, [
@@ -137,36 +136,15 @@ class Server(object):
 		if res is not None:
 			source.send(format(res))
 
+		# A command may have caused a user to become registered
+		if not usr.is_registered() and usr.is_complete():
+			self.register_user(source, usr)
+
 		# Most normal commands do not end with finishing the connection
 		return False
 
-	def update_nickname(self, usr, nick):
-		if (len(nick) > 9):
-			return Message(self._hostname, Reply.ERR.ERRONEUSNICKNAME, [
-				nick, 'erroneous nickname'
-			])
-
-		search = (u for (_, u) in self._users.items() if u.nickname == nick)
-		if next(search, None) is not None:
-			return Message(self._hostname, Reply.ERR.NICKNAMEINUSE, [
-				nick, 'nickname is already in use'
-			])
-
-		usr.nickname = nick
-		return None
-
-	def set_username(self, usr, name, host, serv, real):
-		if usr.is_registered() or usr.username is not None:
-			return Message(self._hostname, Reply.ERR.ALREADYREGISTERED, [
-				'unauthorized command (already registered)'
-			])
-
-		usr.username = name
-		return None
-
-	def try_register(self, source, usr):
-		if usr.is_registered() or not usr.is_complete():
-			return
+	def register_user(self, source, usr):
+		assert not usr.is_registered() and usr.is_complete()
 
 		usr = self._users[source.connection] = RegisteredUser.from_pending(usr)
 		source.send(format(Message(self._hostname, Reply.RPL.WELCOME, [
@@ -176,3 +154,7 @@ class Server(object):
 	@property
 	def users(self):
 		return self._users
+
+	@property
+	def hostmask(self):
+		return self._hostmask
