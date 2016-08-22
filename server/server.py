@@ -144,8 +144,14 @@ class Server(object):
 		return False
 
 	def find_user(self, nick):
-		ulist = self._users.items()
-		return next(u for (_, u) in ulist if u.nickname == n, None)
+		ulist  = self._users.items()
+		result = next(p for p in ulist if p[1].nickname == n, None)
+
+		if result is None:
+			return None
+		else:
+			# Flip the tuple so the result is in a more logical order
+			return result[::-1]
 
 	def register_user(self, source, usr):
 		assert not usr.is_registered() and usr.is_complete()
