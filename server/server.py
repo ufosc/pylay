@@ -18,20 +18,17 @@ class Server(object):
 		for processing.
 		"""
 
-		def __init__(self, serv, addr, conn):
+		def __init__(self, serv, conn):
 			"""
 			Initialize the client listener and its thread.
 
 			:param serv: The server this listener was spawned from.
-			:param addr: The addres the connection was opened on.
 			:param conn: The socket connection itself.
 			:return: None
 			"""
 
 			Thread.__init__(self)
 			self._connection = conn
-			self._address = addr
-
 			self._server = serv
 
 		def run(self):
@@ -67,8 +64,8 @@ class Server(object):
 			self._connection.sendall(data)
 
 		@property
-		def address(self):
-			return self._address
+		def connection(self):
+			return self._connection
 
 	def __init__(self):
 		"""
@@ -102,10 +99,10 @@ class Server(object):
 			(conn, (ip, _)) = sock.accept()
 
 			# All users are pending until the nick and host info is sent
-			self._users[ip] = PendingUser(ip)
+			self._users[conn] = PendingUser(ip)
 
 			# Begin waiting for data from this client
-			Server.Listener(self, ip, conn).start()
+			Server.Listener(self, conn).start()
 
 	def handle_message(self, source, data):
 		"""
@@ -117,12 +114,12 @@ class Server(object):
 		:return: True, if the connection should now close; False otherwise.
 		"""
 
-		usr = self._users[source.address]
+		usr = self._users[source.connection]
 		res = None
 
 		msg = Command(data)
 		if msg.command == Command.QUIT:
-			self._users.pop(source.address)
+			self._users.pop(source.connection)
 			return True
 
 		elif msg.command == Command.NICK:
@@ -171,7 +168,7 @@ class Server(object):
 		if usr.is_registered() or not usr.is_complete():
 			return
 
-		usr = self._users[source.address] = RegisteredUser.from_pending(usr)
+		usr = self._users[source.connection] = RegisteredUser.from_pending(usr)
 		source.send(format(Message(self._hostname, Reply.RPL.WELCOME, [
 			'welcome to pylay IRC ' + format(usr.hostmask)
 		])))
