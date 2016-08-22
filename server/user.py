@@ -63,16 +63,16 @@ class PendingUser(User):
 		return True
 
 	@property
+	def hostname(self):
+		return self._hostname
+
+	@property
 	def username(self):
 		return self._username
 
 	@username.setter
 	def username(self, u):
 		self._username = u
-
-	@property
-	def hostname(self):
-		return self._hostname
 
 	@property
 	def nickname(self):
