@@ -11,8 +11,7 @@ class Handlers:
 				n, 'erroneous nickname'
 			])
 
-		search = (u for (_, u) in serv.users.items() if u.nickname == n)
-		if next(search, None) is not None:
+		if serv.find_user(n) is not None:
 			return Message(serv.hostname, Reply.ERR.NICKNAMEINUSE, [
 				n, 'nickname is already in use'
 			])

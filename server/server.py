@@ -143,6 +143,10 @@ class Server(object):
 		# Most normal commands do not end with finishing the connection
 		return False
 
+	def find_user(self, nick):
+		ulist = self._users.items()
+		return next(u for (_, u) in ulist if u.nickname == n, None)
+
 	def register_user(self, source, usr):
 		assert not usr.is_registered() and usr.is_complete()
 
