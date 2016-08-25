@@ -10,7 +10,7 @@ class User(object):
 		This function should be overriden to specifiy whether a host can send
 		messages, or still need to send USER/NICK info.
 
-		:return: A boolean representing the registered state.
+		@return A boolean representing the registered state.
 		"""
 
 		raise NotImplementedError
@@ -34,8 +34,8 @@ class PendingUser(User):
 		Create a new pending user.
 		The hostname is always available immeadiately.
 
-		:param addr: The hostname of the client.
-		:return: None
+		@param addr The hostname of the client.
+		@return None
 		"""
 
 		#User.__init__(self)
@@ -52,7 +52,7 @@ class PendingUser(User):
 		A pending user is complete once USER/NICK info is available.
 		A user can only be promoted to registered once they are complete.
 
-		:return: A boolean representing whether or not the user is complete.
+		@return A boolean representing whether or not the user is complete.
 		"""
 
 		if self._nickname is None:
@@ -93,8 +93,8 @@ class RegisteredUser(User):
 		"""
 		Promote a pending user to a registered user.
 
-		:param pu: The pending user to promote.
-		:return: A new registered user with the information of the pending user.
+		@param pu The pending user to promote.
+		@return A new registered user with the information of the pending user.
 		"""
 
 		return RegisteredUser(pu.nickname, pu.username, pu.hostname)
@@ -103,10 +103,10 @@ class RegisteredUser(User):
 		"""
 		Create a new registered user with the given identification info.
 
-		:param nick: The user nickname.
-		:param user: The user username.
-		:param host: The user hostname.
-		:return: None
+		@param nick The user nickname.
+		@param user The user username.
+		@param host The user hostname.
+		@return None
 		"""
 
 		#User.__init__(self)

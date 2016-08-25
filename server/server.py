@@ -23,9 +23,9 @@ class Server(object):
 			"""
 			Initialize the client listener and its thread.
 
-			:param serv: The server this listener was spawned from.
-			:param conn: The socket connection itself.
-			:return: None
+			@param serv The server this listener was spawned from.
+			@param conn The socket connection itself.
+			@return None
 			"""
 
 			Thread.__init__(self)
@@ -36,7 +36,7 @@ class Server(object):
 			"""
 			Begin the messaging loop waiting for data from the client.
 
-			:return: None
+			@return None
 			"""
 
 			while True:
@@ -58,8 +58,8 @@ class Server(object):
 			Send some data back to the client.
 			Guaranteed to send all data.
 
-			:param data: The data to send.
-			:return: None
+			@param data The data to send.
+			@return None
 			"""
 
 			self._connection.sendall(data)
@@ -72,7 +72,7 @@ class Server(object):
 		"""
 		Create a new IRC server.
 
-		:return: None
+		@return None
 		"""
 
 		self._users = {}
@@ -82,9 +82,9 @@ class Server(object):
 		"""
 		Begin listening for client connections at the given address.
 
-		:param ip: The IP address to listen on.
-		:param port: The port to listen on. Should be 6660-6669 or 7000.
-		:return: None
+		@param ip The IP address to listen on.
+		@param port The port to listen on. Should be 6660-6669 or 7000.
+		@return None
 		"""
 
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -110,9 +110,9 @@ class Server(object):
 		Perform an action based on the message received.
 		Handle passing messages, managing users/channels, etc.
 
-		:param source: The Listener the data was received on.
-		:param data: The raw data received from the client.
-		:return: True, if the connection should now close; False otherwise.
+		@param source The Listener the data was received on.
+		@param data The raw data received from the client.
+		@return True, if the connection should now close; False otherwise.
 		"""
 
 		usr = self._users[source.connection]

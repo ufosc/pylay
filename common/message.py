@@ -9,8 +9,8 @@ class Message(object):
 		Check if a message contains a prefixed server/client source.
 		The message prefix is optional, and usually present only for replies.
 
-		:param raw: The message in string form.
-		:return: A boolean representing whether or not a prefix exists.
+		@param raw The message in string form.
+		@return A boolean representing whether or not a prefix exists.
 		"""
 
 		return raw.startswith(':')
@@ -20,8 +20,8 @@ class Message(object):
 		"""
 		Split a single argument string into individual arguments.
 
-		:param arg: The arguments as a single string.
-		:return: A list of arguments.
+		@param arg The arguments as a single string.
+		@return A list of arguments.
 		"""
 
 		args = []
@@ -49,10 +49,10 @@ class Message(object):
 		"""
 		Create a new message with the given parts
 
-		:param pre: The prefix of the message, or None.
-		:param cmd: The main command (an all-caps name or a code).
-		:param arg: The arguments.
-		:return: None
+		@param pre The prefix of the message, or None.
+		@param cmd The main command (an all-caps name or a code).
+		@param arg The arguments.
+		@return None
 		"""
 
 		self._prefix = pre
@@ -63,8 +63,8 @@ class Message(object):
 		"""
 		Format a message as it would be sent to a client or server.
 
-		:param spec: The character encoding. Unused.
-		:return: The message formatted as a string.
+		@param spec The character encoding. Unused.
+		@return The message formatted as a string.
 		"""
 
 		# Accumlate the individual parts of the message

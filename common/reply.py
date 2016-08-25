@@ -36,8 +36,8 @@ class Reply(Message):
 		Create a command representation by parsing a raw received message.
 		Similar to Command, but prefix is a string, and command is an int.
 
-		:param raw: The full message in string form.
-		:return: None
+		@param raw The full message in string form.
+		@return None
 		"""
 
 		parts = raw.split()

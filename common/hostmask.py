@@ -12,8 +12,8 @@ class Hostmask(object):
 		"""
 		Parse a hostmask as it is received from a message.
 
-		:param raw: The hostmask, as a string.
-		:return: The constructed Hostmask, or None if invalid.
+		@param raw The hostmask, as a string.
+		@return The constructed Hostmask, or None if invalid.
 		"""
 
 		# Breakdown for parsing a hostmask:
@@ -31,10 +31,10 @@ class Hostmask(object):
 		"""
 		Create a new hostmask with the given parts.
 
-		:param nick: The nickname.
-		:param user: The username.
-		:param host: The hostname.
-		:return: None
+		@param nick The nickname.
+		@param user The username.
+		@param host The hostname.
+		@return None
 		"""
 
 		self._nickname = nick
@@ -46,8 +46,8 @@ class Hostmask(object):
 		Format a hostmask as how it will be seen in a message.
 		The parts of a hostmask are separated by '!' and '@'.
 
-		:param spec: The character encoding. Unused.
-		:return: The hostmask formatted as a string.
+		@param spec The character encoding. Unused.
+		@return The hostmask formatted as a string.
 		"""
 
 		return "{}!{}@{}".format(self._nickname, self._username, self._hostname)
