@@ -38,6 +38,5 @@ class Handlers:
 				n, 'no such nickname'
 			])
 
-		msg = Message(usr.hostmask, Command.PRIVMSG, [n, m])
-		target._connection.send(format(msg))
+		target.send(Message(usr.hostmask, Command.PRIVMSG, [n, m]))
 		return None

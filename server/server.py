@@ -75,7 +75,7 @@ class Server(object):
 			])
 
 		if res is not None:
-			usr._connection.sendall(format(res))
+			usr.send(res)
 
 		# A command may have caused a user to become registered
 		if not usr.is_registered() and usr.can_register():
@@ -91,9 +91,9 @@ class Server(object):
 		assert not usr.is_registered() and usr.can_register()
 
 		usr.register()
-		usr._connection.sendall(format(Message(self._hostname, Reply.RPL.WELCOME, [
+		usr.send(Message(self._hostname, Reply.RPL.WELCOME, [
 			'welcome to pylay IRC ' + format(usr.hostmask)
-		])))
+		]))
 
 	@property
 	def users(self):

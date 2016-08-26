@@ -59,6 +59,17 @@ class User(object):
 
 		self._connection.close()
 
+	def send(self, msg):
+		"""
+		Send a message to this user.
+		The send is guaranteed to complete.
+
+		@param msg A message object to send.
+		"""
+
+		data = format(msg)
+		self._connection.sendall(data)
+
 	def is_registered(self):
 		"""
 		Check if a user has been registered.
