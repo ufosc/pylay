@@ -11,7 +11,6 @@ class User(object):
 		The user starts in an unregistered state.
 
 		@param host The hostname of the user.
-		@return None
 		"""
 
 		self._registered = False
@@ -25,7 +24,6 @@ class User(object):
 
 		@param nickname The nickname to update to.
 		@param username The username to update to.
-		@return None
 		"""
 
 		if username is not None:
@@ -41,8 +39,6 @@ class User(object):
 	def is_registered(self):
 		"""
 		Check if a user has been registered.
-
-		@return None
 		"""
 
 		return self._registered
@@ -65,8 +61,6 @@ class User(object):
 		"""
 		Set a user as registered.
 		A user must have a nickname and a username at this point.
-
-		@return None
 		"""
 
 		if self._registered:

@@ -25,7 +25,6 @@ class Server(object):
 
 			@param serv The server this listener was spawned from.
 			@param conn The socket connection itself.
-			@return None
 			"""
 
 			Thread.__init__(self)
@@ -35,8 +34,6 @@ class Server(object):
 		def run(self):
 			"""
 			Begin the messaging loop waiting for data from the client.
-
-			@return None
 			"""
 
 			while True:
@@ -59,7 +56,6 @@ class Server(object):
 			Guaranteed to send all data.
 
 			@param data The data to send.
-			@return None
 			"""
 
 			self._connection.sendall(data)
@@ -71,8 +67,6 @@ class Server(object):
 	def __init__(self):
 		"""
 		Create a new IRC server.
-
-		@return None
 		"""
 
 		self._users = {}
@@ -84,7 +78,6 @@ class Server(object):
 
 		@param ip The IP address to listen on.
 		@param port The port to listen on. Should be 6660-6669 or 7000.
-		@return None
 		"""
 
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

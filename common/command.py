@@ -19,7 +19,6 @@ class Command(Message):
 		Use functionality from Message, then create a Hostmask from the prefix.
 
 		@param raw The full message in string form.
-		@return None
 		"""
 
 		# Ignore the CRLF

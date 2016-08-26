@@ -52,7 +52,6 @@ class Message(object):
 		@param pre The prefix of the message, or None.
 		@param cmd The main command (an all-caps name or a code).
 		@param arg The arguments.
-		@return None
 		"""
 
 		self._prefix = pre

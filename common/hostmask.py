@@ -51,7 +51,6 @@ class Hostmask(object):
 		@param nick The nickname.
 		@param user The username.
 		@param host The hostname.
-		@return None
 		"""
 
 		self._nickname = nick
