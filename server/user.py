@@ -5,15 +5,18 @@ class User(object):
 	Manages the state of a user, starting from the time of connection.
 	"""
 
-	def __init__(self, host):
+	def __init__(self, conn, host):
 		"""
 		Create a new user that has connected from the given hostname.
 		The user starts in an unregistered state.
 
+		@param conn The socket connection for this user.
 		@param host The hostname of the user.
 		"""
 
 		self._registered = False
+
+		self._connection = conn
 		self._hostmask   = Hostmask(None, None, host)
 
 	def update(self, nickname = None, username = None):
@@ -35,6 +38,18 @@ class User(object):
 
 		if nickname is not None:
 			self._hostmask.nickname = nickname
+
+	def listen(self, handler):
+		while True:
+			data = self._connection.recv(512)
+			if not data:
+				break
+
+			more = handler(self, data)
+			if not more:
+				break
+
+		self._connection.close()
 
 	def is_registered(self):
 		"""

@@ -12,64 +12,12 @@ class Server(object):
 	Manages users and channels, and handles received messages.
 	"""
 
-	class Listener(Thread):
-		"""
-		A single, threaded, connection to a client.
-		Waits for data to be sent from the client, and passes it to the server
-		for processing.
-		"""
-
-		def __init__(self, serv, conn):
-			"""
-			Initialize the client listener and its thread.
-
-			@param serv The server this listener was spawned from.
-			@param conn The socket connection itself.
-			"""
-
-			Thread.__init__(self)
-			self._connection = conn
-			self._server = serv
-
-		def run(self):
-			"""
-			Begin the messaging loop waiting for data from the client.
-			"""
-
-			while True:
-				# IRC messages can be a maximum of 512 characters
-				data = self._connection.recv(512)
-				if not data:
-					break
-
-				# The server method will return True when the client quits
-				done = self._server.handle_message(self, data)
-				if done:
-					break
-
-			# Explicitly finish the connection - any remaining data will be sent
-			self._connection.close()
-
-		def send(self, data):
-			"""
-			Send some data back to the client.
-			Guaranteed to send all data.
-
-			@param data The data to send.
-			"""
-
-			self._connection.sendall(data)
-
-		@property
-		def connection(self):
-			return self._connection
-
 	def __init__(self):
 		"""
 		Create a new IRC server.
 		"""
 
-		self._users = {}
+		self._users = []
 		self._hostname = None
 
 	def start(self, ip, port):
@@ -92,29 +40,27 @@ class Server(object):
 			# A connection has been acquired - get its info
 			(conn, (ip, _)) = sock.accept()
 
-			# All users are pending until the nick and host info is sent
-			self._users[conn] = User(ip)
+			usr = User(conn, ip)
+			self._users.append(usr)
 
-			# Begin waiting for data from this client
-			Server.Listener(self, conn).start()
+			Thread(target = usr.listen, args = (self.handle_message,)).start()
 
-	def handle_message(self, source, data):
+	def handle_message(self, usr, data):
 		"""
 		Perform an action based on the message received.
 		Handle passing messages, managing users/channels, etc.
 
-		@param source The Listener the data was received on.
+		@param usr The User the data was received from.
 		@param data The raw data received from the client.
-		@return True, if the connection should now close; False otherwise.
+		@return False, if the connection should end, True otherwise.
 		"""
 
-		usr = self._users[source.connection]
 		res = None
 
 		msg = Command(data)
 		if msg.command == Command.QUIT:
-			self._users.pop(source.connection)
-			return True
+			self._users.remove(usr)
+			return False
 
 		elif msg.command == Command.NICK:
 			res = Handlers.nick(self, usr, *msg.arguments)
@@ -129,30 +75,23 @@ class Server(object):
 			])
 
 		if res is not None:
-			source.send(format(res))
+			usr._connection.sendall(format(res))
 
 		# A command may have caused a user to become registered
 		if not usr.is_registered() and usr.can_register():
-			self.register_user(source, usr)
+			self.register_user(usr)
 
 		# Most normal commands do not end with finishing the connection
-		return False
+		return True
 
 	def find_user(self, n):
-		ulist  = self._users.items()
-		result = next((p for p in ulist if p[1].hostmask.nickname == n), None)
+		return next((u for u in self._users if u.hostmask.nickname == n), None)
 
-		if result is None:
-			return None
-		else:
-			# Flip the tuple so the result is in a more logical order
-			return result[::-1]
-
-	def register_user(self, source, usr):
+	def register_user(self, usr):
 		assert not usr.is_registered() and usr.can_register()
 
 		usr.register()
-		source.send(format(Message(self._hostname, Reply.RPL.WELCOME, [
+		usr._connection.sendall(format(Message(self._hostname, Reply.RPL.WELCOME, [
 			'welcome to pylay IRC ' + format(usr.hostmask)
 		])))
 

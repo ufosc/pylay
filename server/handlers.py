@@ -39,5 +39,5 @@ class Handlers:
 			])
 
 		msg = Message(usr.hostmask, Command.PRIVMSG, [n, m])
-		target[1].send(format(msg))
+		target._connection.send(format(msg))
 		return None
