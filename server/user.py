@@ -40,6 +40,14 @@ class User(object):
 			self._hostmask.nickname = nickname
 
 	def listen(self, handler):
+		"""
+		Begin listening for messages on the user connection.
+		Will execute the handler for each message until False is returned; the
+		connection will then be closed.
+
+		@param handler The callback function to pass the received data to.
+		"""
+
 		while True:
 			data = self._connection.recv(512)
 			if not data:
