@@ -27,6 +27,21 @@ class Hostmask(object):
 		else:
 			return Hostmask(result.group(1), result.group(2), result.group(3))
 
+	@staticmethod
+	def update(old, username = None, hostname = None):
+		"""
+		Create a new hostmask, based off of another.
+		Will update any passed optional argument.
+
+		@param username The new username to replace old.username.
+		@param hostname The new hostname to replace old.hostname.
+		@return The newly constructed hostname.
+		"""
+
+		self._nickname = old.nickname
+		self._username = username if username is not None else old.username
+		self._hostname = hostname if hostname is not None else old.hostname
+
 	def __init__(self, nick, user, host):
 		"""
 		Create a new hostmask with the given parts.
@@ -50,7 +65,19 @@ class Hostmask(object):
 		@return The hostmask formatted as a string.
 		"""
 
+		if not self.is_valid():
+			raise RuntimeError('cannot format an incomplete hostmask')
+
 		return "{}!{}@{}".format(self._nickname, self._username, self._hostname)
+
+	def is_valid(self):
+		"""
+		Check if all components of a hostmask are present.
+
+		@return True, if the hostmask is valid, False otherwise.
+		"""
+
+		return None not in (self._nickname, self._username, self._hostname)
 
 	@property
 	def nickname(self):
