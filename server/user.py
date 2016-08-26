@@ -2,127 +2,76 @@ from common.hostmask import *
 
 class User(object):
 	"""
-	The common traits of a user, with or without all required information.
+	Manages the state of a user, starting from the time of connection.
 	"""
 
-	def is_registered(self):
+	def __init__(self, host):
 		"""
-		This function should be overriden to specifiy whether a host can send
-		messages, or still need to send USER/NICK info.
+		Create a new user that has connected from the given hostname.
+		The user starts in an unregistered state.
 
-		@return A boolean representing the registered state.
-		"""
-
-		raise NotImplementedError
-
-	@property
-	def nickname(self):
-		raise NotImplementedError
-
-	@nickname.setter
-	def nickname(self, nick):
-		raise NotImplementedError
-
-class PendingUser(User):
-	"""
-	The initial state of a user.
-	The user can only leave this state once USER/NICK info is sent.
-	"""
-
-	def __init__(self, addr):
-		"""
-		Create a new pending user.
-		The hostname is always available immeadiately.
-
-		@param addr The hostname of the client.
+		@param host The hostname of the user.
 		@return None
 		"""
 
-		#User.__init__(self)
-		self._hostname = addr
+		self._registered = False
+		self._hostmask   = Hostmask(None, None, host)
 
-		self._nickname = None
-		self._username = None
+	def update(self, nickname = None, username = None):
+		"""
+		Update the username/nickname of a user after a USER or NICK command.
+		Any argument that is not None will be updated with the given value.
+		Note that the username can only be updated before the user registers.
+
+		@param nickname The nickname to update to.
+		@param username The username to update to.
+		@return None
+		"""
+
+		if username is not None:
+			if self._registered:
+				raise RuntimeError('username has already been solidified')
+			else:
+				newh = Hostmask.update(self._hostmask, username = username)
+				self._hostmask = newh
+
+		if nickname is not None:
+			self._hostmask.nickname = nickname
 
 	def is_registered(self):
-		return False
-
-	def is_complete(self):
 		"""
-		A pending user is complete once USER/NICK info is available.
-		A user can only be promoted to registered once they are complete.
+		Check if a user has been registered.
 
-		@return A boolean representing whether or not the user is complete.
+		@return None
 		"""
 
-		if self._nickname is None:
+		return self._registered
+
+	def can_register(self):
+		"""
+		Check if a user can register in its current state.
+
+		@return True if the user can register, False otherwise.
+		"""
+
+		if self._hostmask.nickname is None:
 			return False
-		if self._username is None:
+		if self._hostmask.username is None:
 			return False
 
 		return True
 
-	@property
-	def hostname(self):
-		return self._hostname
-
-	@property
-	def username(self):
-		return self._username
-
-	@username.setter
-	def username(self, u):
-		self._username = u
-
-	@property
-	def nickname(self):
-		return self._nickname
-
-	@nickname.setter
-	def nickname(self, nick):
-		self._nickname = nick
-
-class RegisteredUser(User):
-	"""
-	A user that has USER/NICK info.
-	A registered user can send messages and use the rest of IRC functionality.
-	"""
-
-	@staticmethod
-	def from_pending(pu):
+	def register(self):
 		"""
-		Promote a pending user to a registered user.
+		Set a user as registered.
+		A user must have a nickname and a username at this point.
 
-		@param pu The pending user to promote.
-		@return A new registered user with the information of the pending user.
-		"""
-
-		return RegisteredUser(pu.nickname, pu.username, pu.hostname)
-
-	def __init__(self, nick, user, host):
-		"""
-		Create a new registered user with the given identification info.
-
-		@param nick The user nickname.
-		@param user The user username.
-		@param host The user hostname.
 		@return None
 		"""
 
-		#User.__init__(self)
-		self._hostmask = Hostmask(nick, user, host)
+		if self._registered:
+			raise RuntimeError('user has already been registered')
+		if not self.can_register():
+			raise RuntimeError('user cannot be registered')
 
-	def is_registered(self):
-		return True
-
-	@property
-	def hostmask(self):
-		return self._hostmask
-
-	@property
-	def nickname(self):
-		return self._hostmask.nickname
-
-	@nickname.setter
-	def nickname(self, nick):
-		self._hostmask.nickname = nick
+		self._registered = True
