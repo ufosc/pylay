@@ -12,6 +12,13 @@ class Server(object):
 	Manages users and channels, and handles received messages.
 	"""
 
+	_callbacks = {
+		Command.QUIT: Handlers.quit,
+		Command.NICK: Handlers.nick,
+		Command.USER: Handlers.user,
+		Command.PRIVMSG: Handlers.privmsg
+	}
+
 	def __init__(self):
 		"""
 		Create a new IRC server.
@@ -55,34 +62,21 @@ class Server(object):
 		@return False, if the connection should end, True otherwise.
 		"""
 
-		res = None
-
 		msg = Command(data)
-		if msg.command == Command.QUIT:
-			self._users.remove(usr)
-			return False
+		res = True
 
-		elif msg.command == Command.NICK:
-			res = Handlers.nick(self, usr, *msg.arguments)
-		elif msg.command == Command.USER:
-			res = Handlers.user(self, usr, *msg.arguments)
-		elif msg.command == Command.PRIVMSG:
-			res = Handlers.privmsg(self, usr, *msg.arguments)
-
-		else:
-			res = Message(self._hostname, Reply.ERR.UNKNOWNCOMMAND, [
+		try:
+			res = Server._callbacks[msg.command](self, usr, *msg.arguments)
+		except KeyError:
+			usr.send(Message(self._hostname, Reply.ERR.UNKNOWNCOMMAND, [
 				msg.command, 'unknown command'
-			])
-
-		if res is not None:
-			usr.send(res)
+			]))
 
 		# A command may have caused a user to become registered
 		if not usr.is_registered() and usr.can_register():
 			self.register_user(usr)
 
-		# Most normal commands do not end with finishing the connection
-		return True
+		return res
 
 	def find_user(self, n):
 		return next((u for u in self._users if u.hostmask.nickname == n), None)
