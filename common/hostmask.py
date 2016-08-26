@@ -38,9 +38,11 @@ class Hostmask(object):
 		@return The newly constructed hostname.
 		"""
 
-		self._nickname = old.nickname
-		self._username = username if username is not None else old.username
-		self._hostname = hostname if hostname is not None else old.hostname
+		n = old.nickname
+		u = username if username is not None else old.username
+		h = hostname if hostname is not None else old.hostname
+
+		return Hostmask(n, u, h)
 
 	def __init__(self, nick, user, host):
 		"""

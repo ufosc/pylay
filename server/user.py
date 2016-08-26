@@ -75,3 +75,7 @@ class User(object):
 			raise RuntimeError('user cannot be registered')
 
 		self._registered = True
+
+	@property
+	def hostmask(self):
+		return self._hostmask

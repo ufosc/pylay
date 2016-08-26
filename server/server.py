@@ -100,7 +100,7 @@ class Server(object):
 			(conn, (ip, _)) = sock.accept()
 
 			# All users are pending until the nick and host info is sent
-			self._users[conn] = PendingUser(ip)
+			self._users[conn] = User(ip)
 
 			# Begin waiting for data from this client
 			Server.Listener(self, conn).start()
@@ -139,15 +139,15 @@ class Server(object):
 			source.send(format(res))
 
 		# A command may have caused a user to become registered
-		if not usr.is_registered() and usr.is_complete():
+		if not usr.is_registered() and usr.can_register():
 			self.register_user(source, usr)
 
 		# Most normal commands do not end with finishing the connection
 		return False
 
-	def find_user(self, nick):
+	def find_user(self, n):
 		ulist  = self._users.items()
-		result = next((p for p in ulist if p[1].nickname == nick), None)
+		result = next((p for p in ulist if p[1].hostmask.nickname == n), None)
 
 		if result is None:
 			return None
@@ -156,9 +156,9 @@ class Server(object):
 			return result[::-1]
 
 	def register_user(self, source, usr):
-		assert not usr.is_registered() and usr.is_complete()
+		assert not usr.is_registered() and usr.can_register()
 
-		usr = self._users[source.connection] = RegisteredUser.from_pending(usr)
+		usr.register()
 		source.send(format(Message(self._hostname, Reply.RPL.WELCOME, [
 			'welcome to pylay IRC ' + format(usr.hostmask)
 		])))

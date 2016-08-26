@@ -17,17 +17,17 @@ class Handlers:
 				n, 'nickname is already in use'
 			])
 
-		usr.nickname = n
+		usr.update(nickname = n)
 		return None
 
 	@staticmethod
 	def user(serv, usr, n, h, s, r):
-		if usr.is_registered() or usr.username is not None:
+		if usr.is_registered() or usr.hostmask.username is not None:
 			return Message(serv.hostname, Reply.ERR.ALREADYREGISTERED, [
 				'unauthorized command (already registered)'
 			])
 
-		usr.username = n
+		usr.update(username = n)
 		return None
 
 	@staticmethod
