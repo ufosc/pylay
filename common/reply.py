@@ -29,6 +29,7 @@ class Reply(Message):
 		NICKNAMEINUSE    = 433
 		NICKCOLLISION    = 436
 
+		NOTREGISTERED     = 451
 		ALREADYREGISTERED = 462
 
 	def __init__(self, raw):

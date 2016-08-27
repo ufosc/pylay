@@ -7,7 +7,7 @@ class Handlers:
 
 	@staticmethod
 	def quit(serv, usr):
-		return False
+		pass
 
 	@staticmethod
 	def nick(serv, usr, n):
@@ -15,27 +15,23 @@ class Handlers:
 			usr.send(Message(serv.hostname, Reply.ERR.ERRONEUSNICKNAME, [
 				n, 'erroneous nickname'
 			]))
-			return True
+			return
 
 		if serv.find_user(n) is not None:
 			usr.send(Message(serv.hostname, Reply.ERR.NICKNAMEINUSE, [
 				n, 'nickname is already in use'
 			]))
-			return True
+			return
 
 		usr.update(nickname = n)
-		return True
+		if usr.can_register():
+			serv.register_user(usr)
 
 	@staticmethod
 	def user(serv, usr, n, h, s, r):
-		if usr.is_registered() or usr.hostmask.username is not None:
-			usr.send(Message(serv.hostname, Reply.ERR.ALREADYREGISTERED, [
-				'unauthorized command (already registered)'
-			]))
-			return True
-
 		usr.update(username = n)
-		return True
+		if usr.can_register():
+			serv.register_user(usr)
 
 	@staticmethod
 	def privmsg(serv, usr, n, m):
@@ -44,7 +40,6 @@ class Handlers:
 			usr.send(Message(serv.hostname, Reply.ERR.NOSUCHNICK, [
 				n, 'no such nickname'
 			]))
-			return True
+			return
 
 		target.send(Message(usr.hostmask, Command.PRIVMSG, [n, m]))
-		return True

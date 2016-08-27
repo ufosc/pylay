@@ -13,10 +13,10 @@ class Server(object):
 	"""
 
 	_callbacks = {
-		Command.QUIT: Handlers.quit,
-		Command.NICK: Handlers.nick,
-		Command.USER: Handlers.user,
-		Command.PRIVMSG: Handlers.privmsg
+		Command.QUIT:    (None,  Handlers.quit),
+		Command.NICK:    (None,  Handlers.nick),
+		Command.USER:    (False, Handlers.user),
+		Command.PRIVMSG: (True,  Handlers.privmsg)
 	}
 
 	def __init__(self):
@@ -59,24 +59,27 @@ class Server(object):
 
 		@param usr The User the data was received from.
 		@param data The raw data received from the client.
-		@return False, if the connection should end, True otherwise.
 		"""
 
-		msg = Command(data)
-		res = True
-
 		try:
-			res = Server._callbacks[msg.command](self, usr, *msg.arguments)
+			msg = Command(data)
+			(reg, cb) = Server._callbacks[msg.command]
+
+			if reg == True and not usr.is_registered():
+				usr.send(Message(self._hostname, Reply.ERR.NOTREGISTERED, [
+					'you have not registered'
+				]))
+			elif reg == False and usr.is_registered():
+				usr.send(Message(self._hostname, Reply.ERR.ALREADYREGISTERED, [
+					'unauthorized command (already registered)'
+				]))
+			else:
+				cb(self, usr, *msg.arguments)
+
 		except KeyError:
 			usr.send(Message(self._hostname, Reply.ERR.UNKNOWNCOMMAND, [
 				msg.command, 'unknown command'
 			]))
-
-		# A command may have caused a user to become registered
-		if not usr.is_registered() and usr.can_register():
-			self.register_user(usr)
-
-		return res
 
 	def find_user(self, n):
 		return next((u for u in self._users if u.hostmask.nickname == n), None)
