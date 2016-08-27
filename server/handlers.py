@@ -7,7 +7,7 @@ class Handlers:
 
 	@staticmethod
 	def quit(serv, usr):
-		pass
+		serv.remove_user(usr)
 
 	@staticmethod
 	def nick(serv, usr, n):
@@ -25,13 +25,19 @@ class Handlers:
 
 		usr.update(nickname = n)
 		if usr.can_register():
-			serv.register_user(usr)
+			usr.register()
+			usr.send(Message(serv.hostname, Reply.RPL.WELCOME, [
+				'welcome to pylay IRC ' + format(usr.hostmask)
+			]))
 
 	@staticmethod
 	def user(serv, usr, n, h, s, r):
 		usr.update(username = n)
 		if usr.can_register():
-			serv.register_user(usr)
+			usr.register()
+			usr.send(Message(serv.hostname, Reply.RPL.WELCOME, [
+				'welcome to pylay IRC ' + format(usr.hostmask)
+			]))
 
 	@staticmethod
 	def privmsg(serv, usr, n, m):

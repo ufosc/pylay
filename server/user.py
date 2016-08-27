@@ -15,9 +15,10 @@ class User(object):
 		"""
 
 		self._registered = False
+		self._alive = True
 
 		self._connection = conn
-		self._hostmask   = Hostmask(None, None, host)
+		self._hostmask = Hostmask(None, None, host)
 
 	def update(self, nickname = None, username = None):
 		"""
@@ -46,7 +47,7 @@ class User(object):
 		@param handler The callback function to pass the received data to.
 		"""
 
-		while True:
+		while self._alive:
 			data = self._connection.recv(512)
 			handler(self, data)
 
@@ -98,6 +99,13 @@ class User(object):
 			raise RuntimeError('user cannot be registered')
 
 		self._registered = True
+
+	def die(self):
+		"""
+		Signal this user to stop listening on its connection and shut down.
+		"""
+
+		self._alive = False
 
 	@property
 	def hostmask(self):

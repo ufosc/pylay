@@ -84,13 +84,9 @@ class Server(object):
 	def find_user(self, n):
 		return next((u for u in self._users if u.hostmask.nickname == n), None)
 
-	def register_user(self, usr):
-		assert not usr.is_registered() and usr.can_register()
-
-		usr.register()
-		usr.send(Message(self._hostname, Reply.RPL.WELCOME, [
-			'welcome to pylay IRC ' + format(usr.hostmask)
-		]))
+	def remove_user(self, usr):
+		self._users.remove(usr)
+		usr.die()
 
 	@property
 	def users(self):
