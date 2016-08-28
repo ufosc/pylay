@@ -65,14 +65,15 @@ class Server(object):
 			msg = Command(data)
 			(reg, cb) = Server._callbacks[msg.command]
 
-			if reg == True and not usr.is_registered():
+			if reg and not usr.is_registered():
 				usr.send(Message(self._hostname, Reply.ERR.NOTREGISTERED, [
 					'you have not registered'
 				]))
-			elif reg == False and usr.is_registered():
+			elif not reg and usr.is_registered():
 				usr.send(Message(self._hostname, Reply.ERR.ALREADYREGISTERED, [
 					'unauthorized command (already registered)'
 				]))
+
 			else:
 				cb(self, usr, *msg.arguments)
 
@@ -81,8 +82,11 @@ class Server(object):
 				msg.command, 'unknown command'
 			]))
 
-	def find_user(self, n):
-		return next((u for u in self._users if u.hostmask.nickname == n), None)
+	def get_user(self, n):
+		try:
+			return next(u for u in self._users if u.hostmask.nickname == n)
+		except StopIteration:
+			raise ValueError('nickname not found')
 
 	def remove_user(self, usr):
 		self._users.remove(usr)

@@ -11,17 +11,19 @@ class Handlers:
 
 	@staticmethod
 	def nick(serv, usr, n):
-		if (len(n) > 9):
+		if len(n) > 9:
 			usr.send(Message(serv.hostname, Reply.ERR.ERRONEUSNICKNAME, [
 				n, 'erroneous nickname'
 			]))
 			return
 
-		if serv.find_user(n) is not None:
+		try:
+			serv.get_user(n)
 			usr.send(Message(serv.hostname, Reply.ERR.NICKNAMEINUSE, [
 				n, 'nickname is already in use'
 			]))
-			return
+		except ValueError:
+			pass
 
 		usr.update(nickname = n)
 		if usr.can_register():
@@ -41,11 +43,10 @@ class Handlers:
 
 	@staticmethod
 	def privmsg(serv, usr, n, m):
-		target = serv.find_user(n)
-		if target is None:
+		try:
+			target = serv.get_user(n)
+			target.send(Message(usr.hostmask, Command.PRIVMSG, [n, m]))
+		except ValueError:
 			usr.send(Message(serv.hostname, Reply.ERR.NOSUCHNICK, [
 				n, 'no such nickname'
 			]))
-			return
-
-		target.send(Message(usr.hostmask, Command.PRIVMSG, [n, m]))
