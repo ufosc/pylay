@@ -1,4 +1,5 @@
 from server.user import User
+from server.error import NoUserError
 from common.message import Message
 from common.reply import Reply
 from common.command import Command
@@ -22,7 +23,7 @@ class Handlers:
 			usr.send(Message(serv.hostname, Reply.ERR.NICKNAMEINUSE, [
 				n, 'nickname is already in use'
 			]))
-		except ValueError:
+		except NoUserError:
 			pass
 
 		usr.update(nickname = n)
@@ -46,7 +47,7 @@ class Handlers:
 		try:
 			target = serv.get_user(n)
 			target.send(Message(usr.hostmask, Command.PRIVMSG, [n, m]))
-		except ValueError:
+		except NoUserError:
 			usr.send(Message(serv.hostname, Reply.ERR.NOSUCHNICK, [
 				n, 'no such nickname'
 			]))

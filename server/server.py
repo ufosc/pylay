@@ -3,6 +3,7 @@ from threading import Thread
 
 from server.user import User
 from server.handlers import Handlers
+from server.error import NoUserError
 from common.command import Command
 from common.reply import Reply
 
@@ -86,7 +87,7 @@ class Server(object):
 		try:
 			return next(u for u in self._users if u.hostmask.nickname == n)
 		except StopIteration:
-			raise ValueError('nickname not found')
+			raise NoUserError from None
 
 	def remove_user(self, usr):
 		self._users.remove(usr)
