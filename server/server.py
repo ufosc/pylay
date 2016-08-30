@@ -2,7 +2,7 @@ import socket
 from threading import Thread
 
 from server.user import User
-from server.handlers import Handlers
+from server.handlers import handler_map
 from server.error import NoUserError
 from common.command import Command
 from common.reply import Reply
@@ -12,13 +12,6 @@ class Server(object):
 	An instance of an IRC server.
 	Manages users and channels, and handles received messages.
 	"""
-
-	_callbacks = {
-		Command.QUIT:    (None,  Handlers.quit),
-		Command.NICK:    (None,  Handlers.nick),
-		Command.USER:    (False, Handlers.user),
-		Command.PRIVMSG: (True,  Handlers.privmsg)
-	}
 
 	def __init__(self):
 		"""
@@ -64,7 +57,7 @@ class Server(object):
 
 		try:
 			msg = Command(data)
-			(reg, cb) = Server._callbacks[msg.command]
+			(reg, cb) = handler_map[msg.command]
 
 			if reg == True and not usr.is_registered():
 				usr.send(Message(self._hostname, Reply.ERR.NOTREGISTERED, [
