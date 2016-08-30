@@ -1,5 +1,5 @@
-from message import *
-from hostmask import *
+from common.message import *
+from common.hostmask import *
 
 class Command(Message):
 	"""

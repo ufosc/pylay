@@ -48,7 +48,7 @@ class User(object):
 		"""
 
 		while self._alive:
-			data = self._connection.recv(512)
+			data = self._connection.recv(512).decode('utf8')
 			handler(self, data)
 
 		self._connection.close()
@@ -62,7 +62,7 @@ class User(object):
 		"""
 
 		data = format(msg)
-		self._connection.sendall(data)
+		self._connection.sendall(bytes(data, 'utf8'))
 
 	def is_registered(self):
 		"""

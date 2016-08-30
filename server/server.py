@@ -1,8 +1,8 @@
 import socket
 from threading import Thread
 
-from user import *
-from handlers import *
+from server.user import *
+from server.handlers import *
 from common.command import *
 from common.reply import *
 
@@ -65,11 +65,11 @@ class Server(object):
 			msg = Command(data)
 			(reg, cb) = Server._callbacks[msg.command]
 
-			if reg and not usr.is_registered():
+			if reg == True and not usr.is_registered():
 				usr.send(Message(self._hostname, Reply.ERR.NOTREGISTERED, [
 					'you have not registered'
 				]))
-			elif not reg and usr.is_registered():
+			elif reg == False and usr.is_registered():
 				usr.send(Message(self._hostname, Reply.ERR.ALREADYREGISTERED, [
 					'unauthorized command (already registered)'
 				]))

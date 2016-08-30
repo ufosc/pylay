@@ -1,5 +1,6 @@
-from server import *
-from user import *
+from server.server import *
+from server.user import *
+from common.message import *
 from common.reply import *
 from common.command import *
 
