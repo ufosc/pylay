@@ -1,10 +1,10 @@
 import socket
 from threading import Thread
 
-from server.user import *
-from server.handlers import *
-from common.command import *
-from common.reply import *
+from server.user import User
+from server.handlers import Handlers
+from common.command import Command
+from common.reply import Reply
 
 class Server(object):
 	"""

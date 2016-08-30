@@ -1,4 +1,4 @@
-from common.message import *
+from common.message import Message
 
 class Reply(Message):
 	"""

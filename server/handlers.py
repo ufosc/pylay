@@ -1,8 +1,7 @@
-from server.server import *
-from server.user import *
-from common.message import *
-from common.reply import *
-from common.command import *
+from server.user import User
+from common.message import Message
+from common.reply import Reply
+from common.command import Command
 
 class Handlers:
 
