@@ -1,5 +1,7 @@
 import re
 
+from common.error import NicknameError
+
 class Hostmask(object):
 	"""
 	A unique identifier for a client.
@@ -86,6 +88,10 @@ class Hostmask(object):
 
 	@nickname.setter
 	def nickname(self, nick):
+		chars = len(nick)
+		if chars < 1 or chars > 9:
+			raise NicknameError
+
 		self._nickname = nick
 
 	@property

@@ -1,0 +1,2 @@
+class NicknameError(Exception):
+	pass
