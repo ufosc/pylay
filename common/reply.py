@@ -40,7 +40,8 @@ class Reply(Message):
 		@param raw The full message in string form.
 		"""
 
-		parts = raw.split()
+		# Ignoret the CRLF
+		parts = raw[:-2].split()
 
 		pre = None
 		if Message.has_prefix(raw):
