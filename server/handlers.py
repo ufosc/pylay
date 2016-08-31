@@ -1,9 +1,8 @@
 from server.user import User
-from server.error import NoUserError
+from server.error import NoUserError, NoChannelError
 from common.message import Message
 from common.reply import Reply
 from common.command import Command
-from common.channel import Channel
 from common.error import BadNicknameError, BadChannelError
 
 def check_state(serv, usr, state):
@@ -54,7 +53,7 @@ def user(serv, usr, n, h, s, r):
 
 def join(serv, usr, n):
 	try:
-		chan = Channel.from_raw(n)
+		chan = serv.get_channel(n)
 		serv.join_channel(chan, usr)
 	except BadChannelError:
 		usr.send(Message(serv.hostname, Reply.ERR.NOSUCHCHANNEL, [
@@ -63,11 +62,20 @@ def join(serv, usr, n):
 
 def privmsg(serv, usr, n, m):
 	try:
+		chan = serv.get_channel(n)
+		us = serv.get_channel_users(chan)
+		targets = [u for u in us if u != usr]
+
+		for t in targets:
+			t.send(Message(usr.hostmask, Command.PRIVMSG, [n, m]))
+
+	except BadChannelError:
 		target = serv.get_user(n)
 		target.send(Message(usr.hostmask, Command.PRIVMSG, [n, m]))
-	except NoUserError:
-		usr.send(Message(serv.hostname, Reply.ERR.NOSUCHNICK, [
-			n, 'no such nickname'
+
+	except NoChannelError:
+		usr.send(Message(serv.hostname, Reply.ERR.NOSUCHCHANNEL, [
+			n, 'no such channel'
 		]))
 
 handler_map = {

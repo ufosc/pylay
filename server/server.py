@@ -5,6 +5,7 @@ from server.user import User
 from server.error import NoUserError, NoChannelError
 from common.command import Command
 from common.reply import Reply
+from common.channel import Channel
 
 class Server:
 	"""
@@ -81,15 +82,27 @@ class Server:
 		# Will stop the listen loop and close the connection, ending the thread
 		usr.die()
 
-	def join_channel(self, chan, usr):
-		self._channels[chan].append(usr)
-		self._users[usr].append(chan)
+	def get_channel(self, n):
+		try:
+			cs = self._channels.keys()
+			return next(c for c in cs if format(c) == n)
+		except StopIteration:
+			c = Channel.from_raw(n)
+			self._channels[c] = []
+			return c
 
 	def get_channel_users(self, chan):
 		try:
 			return self._channels[chan]
 		except KeyError:
 			raise NoChannelError from None
+
+	def join_channel(self, chan, usr):
+		if chan not in self._channels:
+			self._channels[chan] = []
+
+		self._channels[chan].append(usr)
+		self._users[usr].append(chan)
 
 	@property
 	def hostname(self):
