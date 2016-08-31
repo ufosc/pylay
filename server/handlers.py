@@ -4,7 +4,7 @@ from common.message import Message
 from common.reply import Reply
 from common.command import Command
 from common.channel import Channel
-from common.error import BadNicknameError
+from common.error import BadNicknameError, BadChannelError
 
 def check_state(serv, usr, state):
 	if state == True and not usr.is_registered():
@@ -53,8 +53,13 @@ def user(serv, usr, n, h, s, r):
 		]))
 
 def join(serv, usr, n):
-	chan = Channel(n)
-	serv.join_channel(chan, usr)
+	try:
+		chan = Channel.from_raw(n)
+		serv.join_channel(chan, usr)
+	except BadChannelError:
+		usr.send(Message(serv.hostname, Reply.ERR.NOSUCHCHANNEL, [
+			n, 'no such channel'
+		]))
 
 def privmsg(serv, usr, n, m):
 	try:

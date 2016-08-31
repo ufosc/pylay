@@ -3,3 +3,6 @@ class BadHostmaskError(Exception):
 
 class BadNicknameError(Exception):
 	pass
+
+class BadChannelError(Exception):
+	pass

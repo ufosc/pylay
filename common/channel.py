@@ -1,5 +1,7 @@
 import re
 
+from common.error import BadChannelError
+
 class Channel:
 	"""
 	Manages the state and information pertaining to an IRC channel.
@@ -28,9 +30,9 @@ class Channel:
 		result = re.search("^([#&])([^ ,]{1,199})$", raw)
 
 		if result is None:
-			return None
-		else:
-			return Channel(result.group(2), result.group(1))
+			raise BadChannelError
+
+		return Channel(result.group(2), result.group(1))
 
 	def __init__(self, n, t):
 		"""

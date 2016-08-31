@@ -32,6 +32,8 @@ class Reply(Message):
 		NOTREGISTERED     = 451
 		ALREADYREGISTERED = 462
 
+		NOSUCHCHANNEL = 403
+
 	def __init__(self, raw):
 		"""
 		Create a command representation by parsing a raw received message.
