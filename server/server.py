@@ -17,7 +17,7 @@ class Server:
 		Create a new IRC server.
 		"""
 
-		self._users = []
+		self._users = {}
 		self._hostname = None
 
 	def start(self, ip, port, callback):
@@ -43,8 +43,9 @@ class Server:
 
 			# The user will manage its own connection info
 			usr = User(conn, ip)
-			# Users are autonomous, but store in a list for nickname lookup
-			self._users.append(usr)
+			# Users are autonomous, but store them as a key to keep track of
+			# the channels they belong to
+			self._users[usr] = []
 
 			# Let the user start listening on its own thread
 			Thread(target = usr.listen, args = (callback,)).start()
@@ -59,7 +60,8 @@ class Server:
 		"""
 
 		try:
-			return next(u for u in self._users if u.hostmask.nickname == n)
+			us = self._users.keys()
+			return next(u for u in us if u.hostmask.nickname == n)
 		except StopIteration:
 			raise NoUserError from None
 
@@ -73,13 +75,9 @@ class Server:
 
 		# The server needs to remove the user instead of just calling die to
 		# make sure a dead user does not remain in the user list
-		self._users.remove(usr)
+		self._users.pop(usr)
 		# Will stop the listen loop and close the connection, ending the thread
 		usr.die()
-
-	@property
-	def users(self):
-		return self._users
 
 	@property
 	def hostname(self):
