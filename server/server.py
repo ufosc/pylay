@@ -83,21 +83,47 @@ class Server:
 		usr.die()
 
 	def get_channel(self, n):
+		"""
+		Get the channel with the given (fully-qualified) name.
+
+		@param n The name of the channel to search for.
+		@return The retrieved channel.
+		"""
+
 		try:
 			cs = self._channels.keys()
+			# The name includes the prefix, so format each channel to match
 			return next(c for c in cs if format(c) == n)
+
 		except StopIteration:
+			# When no channel is found, it is automatically created
 			c = Channel.from_raw(n)
+			# The channel starts out with no users
 			self._channels[c] = []
+
 			return c
 
 	def get_channel_users(self, chan):
+		"""
+		Return a list of users that are currently in a channel.
+
+		@param chan The channel object to get users from.
+		@return A list of joined users.
+		"""
+
 		try:
 			return self._channels[chan]
 		except KeyError:
 			raise NoChannelError from None
 
 	def join_channel(self, chan, usr):
+		"""
+		Add to the list of joined users for a channel.
+
+		@param chan The target channel.
+		@param usr The usr trying to join.
+		"""
+
 		if chan not in self._channels:
 			self._channels[chan] = []
 
