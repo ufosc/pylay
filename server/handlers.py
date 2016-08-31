@@ -78,7 +78,7 @@ handler_map = {
 	Command.JOIN:    (True,  join)
 }
 
-def unknown_handler(serv, usr, state):
+def unknown_handler(serv, usr, cmd):
 	usr.send(Message(serv.hostname, Reply.ERR.UNKNOWNCOMMAND, [
-		msg.command, 'unknown command'
+		cmd, 'unknown command'
 	]))
