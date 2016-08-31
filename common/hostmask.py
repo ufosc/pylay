@@ -1,6 +1,6 @@
 import re
 
-from common.error import NicknameError
+from common.error import BadHostmaskError, NicknameError
 
 class Hostmask(object):
 	"""
@@ -32,7 +32,9 @@ class Hostmask(object):
 	@staticmethod
 	def update(old, username = None, hostname = None):
 		"""
-		Create a new hostmask, based off of another.
+		Create a new hostmask, based off of another. Since the username and
+		hostname of a user cannot be changed, any modification to these fields
+		should create a new hostmask instead.
 		Will update any passed optional argument.
 
 		@param username The new username to replace old.username.
@@ -69,7 +71,7 @@ class Hostmask(object):
 		"""
 
 		if not self.is_valid():
-			raise RuntimeError('cannot format an incomplete hostmask')
+			raise BadHostmaskError
 
 		return "{}!{}@{}".format(self._nickname, self._username, self._hostname)
 
@@ -88,6 +90,13 @@ class Hostmask(object):
 
 	@nickname.setter
 	def nickname(self, nick):
+		"""
+		Set the nickname of this host.
+		The new nickname must be between 1 and 9 characters, inclusive.
+
+		@param nick The new nickname.
+		"""
+
 		chars = len(nick)
 		if chars < 1 or chars > 9:
 			raise NicknameError

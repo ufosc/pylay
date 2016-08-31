@@ -14,7 +14,9 @@ class User(object):
 		@param host The hostname of the user.
 		"""
 
+		# A user can be registered once it has a fully complete hostmask
 		self._registered = False
+		# A thread can continue the listen loop until it is no longer alive
 		self._alive = True
 
 		self._connection = conn
@@ -31,11 +33,11 @@ class User(object):
 		"""
 
 		if username is not None:
-			if self._registered:
-				raise RuntimeError('username has already been solidified')
-			else:
-				newh = Hostmask.update(self._hostmask, username = username)
-				self._hostmask = newh
+			# A username can only be set in the "waiting to register" state
+			assert not self._registered
+			# Hostmask user/host is immutable, so create an updated copy
+			newh = Hostmask.update(self._hostmask, username = username)
+			self._hostmask = newh
 
 		if nickname is not None:
 			self._hostmask.nickname = nickname
@@ -48,9 +50,11 @@ class User(object):
 		"""
 
 		while self._alive:
+			# 512 is the maximum IRC message size, and always is encoded ASCII
 			data = self._connection.recv(512).decode('ascii')
 			callback(self, data)
 
+		# Once dead, close the connection and finish off this user
 		self._connection.close()
 
 	def send(self, msg):
@@ -80,6 +84,7 @@ class User(object):
 
 		if self._registered:
 			return False
+		# A user can register once all components of its hostmask are present
 		if self._hostmask.nickname is None:
 			return False
 		if self._hostmask.username is None:
@@ -93,10 +98,9 @@ class User(object):
 		A user must have a nickname and a username at this point.
 		"""
 
-		if self._registered:
-			raise RuntimeError('user has already been registered')
-		if not self.can_register():
-			raise RuntimeError('user cannot be registered')
+		# Always call can_register before attempting to call register
+		assert not self._registered
+		assert self.can_register()
 
 		self._registered = True
 
@@ -105,6 +109,7 @@ class User(object):
 		Signal this user to stop listening on its connection and shut down.
 		"""
 
+		# The thread will actually die the next time the listen loop runs
 		self._alive = False
 
 	@property
