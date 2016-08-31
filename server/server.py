@@ -2,7 +2,7 @@ import socket
 from threading import Thread
 
 from server.user import User
-from server.error import NoUserError
+from server.error import NoUserError, NoChannelError
 from common.command import Command
 from common.reply import Reply
 
@@ -17,7 +17,9 @@ class Server:
 		Create a new IRC server.
 		"""
 
-		self._users = {}
+		self._users    = {}
+		self._channels = {}
+
 		self._hostname = None
 
 	def start(self, ip, port, callback):
@@ -78,6 +80,16 @@ class Server:
 		self._users.pop(usr)
 		# Will stop the listen loop and close the connection, ending the thread
 		usr.die()
+
+	def join_channel(self, chan, usr):
+		self._channels[chan].append(usr)
+		self._users[usr].append(chan)
+
+	def get_channel_users(self, chan):
+		try:
+			return self._channels[chan]
+		except KeyError:
+			raise NoChannelError from None
 
 	@property
 	def hostname(self):

@@ -3,6 +3,7 @@ from server.error import NoUserError
 from common.message import Message
 from common.reply import Reply
 from common.command import Command
+from common.channel import Channel
 from common.error import BadNicknameError
 
 def check_state(serv, usr, state):
@@ -51,6 +52,10 @@ def user(serv, usr, n, h, s, r):
 			'welcome to pylay IRC ' + format(usr.hostmask)
 		]))
 
+def join(serv, usr, n):
+	chan = Channel(n)
+	serv.join_channel(chan, usr)
+
 def privmsg(serv, usr, n, m):
 	try:
 		target = serv.get_user(n)
@@ -64,7 +69,8 @@ handler_map = {
 	Command.QUIT:    (None,  quit),
 	Command.NICK:    (None,  nick),
 	Command.USER:    (False, user),
-	Command.PRIVMSG: (True,  privmsg)
+	Command.PRIVMSG: (True,  privmsg),
+	Command.JOIN:    (True,  join)
 }
 
 def unknown_handler(serv, usr, state):
