@@ -3,7 +3,7 @@ from server.error import NoUserError
 from common.message import Message
 from common.reply import Reply
 from common.command import Command
-from common.error import NicknameError
+from common.error import BadNicknameError
 
 def check_state(serv, usr, state):
 	if state == True and not usr.is_registered():
@@ -38,7 +38,7 @@ def nick(serv, usr, n):
 				usr.send(Message(serv.hostname, Reply.RPL.WELCOME, [
 					'welcome to pylay IRC ' + format(usr.hostmask)
 				]))
-		except NicknameError:
+		except BadNicknameError:
 			usr.send(Message(serv.hostname, Reply.ERR.ERRONEUSNICKNAME, [
 				n, 'erroneous nickname'
 			]))

@@ -1,5 +1,5 @@
 class BadHostmaskError(Exception):
 	pass
 
-class NicknameError(Exception):
+class BadNicknameError(Exception):
 	pass

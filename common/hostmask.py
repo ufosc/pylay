@@ -1,6 +1,6 @@
 import re
 
-from common.error import BadHostmaskError, NicknameError
+from common.error import BadHostmaskError, BadNicknameError
 
 class Hostmask(object):
 	"""
@@ -99,7 +99,7 @@ class Hostmask(object):
 
 		chars = len(nick)
 		if chars < 1 or chars > 9:
-			raise NicknameError
+			raise BadNicknameError
 
 		self._nickname = nick
 
