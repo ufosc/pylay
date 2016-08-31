@@ -6,7 +6,7 @@ from server.error import NoUserError
 from common.command import Command
 from common.reply import Reply
 
-class Server(object):
+class Server:
 	"""
 	An instance of an IRC server.
 	Manages users and channels, and handles received messages.

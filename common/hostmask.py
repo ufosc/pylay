@@ -2,7 +2,7 @@ import re
 
 from common.error import BadHostmaskError, BadNicknameError
 
-class Hostmask(object):
+class Hostmask:
 	"""
 	A unique identifier for a client.
 	This information is usually the first part of a message from a server, and

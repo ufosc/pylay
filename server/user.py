@@ -1,6 +1,6 @@
 from common.hostmask import *
 
-class User(object):
+class User:
 	"""
 	Manages the state of a user, starting from the time of connection.
 	"""
