@@ -40,16 +40,16 @@ class User(object):
 		if nickname is not None:
 			self._hostmask.nickname = nickname
 
-	def listen(self, handler):
+	def listen(self, callback):
 		"""
 		Begin listening for messages on the user connection.
 
-		@param handler The callback function to pass the received data to.
+		@param callback The callback function to pass the received data to.
 		"""
 
 		while self._alive:
 			data = self._connection.recv(512).decode('ascii')
-			handler(self, data)
+			callback(self, data)
 
 		self._connection.close()
 

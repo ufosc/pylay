@@ -2,7 +2,6 @@ import socket
 from threading import Thread
 
 from server.user import User
-from server.handlers import handler_map
 from server.error import NoUserError
 from common.command import Command
 from common.reply import Reply
@@ -21,12 +20,13 @@ class Server(object):
 		self._users = []
 		self._hostname = None
 
-	def start(self, ip, port):
+	def start(self, ip, port, callback):
 		"""
 		Begin listening for client connections at the given address.
 
 		@param ip The IP address to listen on.
 		@param port The port to listen on. Should be 6660-6669 or 7000.
+		@param callback The function to call when a thread receives a message
 		"""
 
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -44,37 +44,7 @@ class Server(object):
 			usr = User(conn, ip)
 			self._users.append(usr)
 
-			Thread(target = usr.listen, args = (self.handle_message,)).start()
-
-	def handle_message(self, usr, data):
-		"""
-		Perform an action based on the message received.
-		Handle passing messages, managing users/channels, etc.
-
-		@param usr The User the data was received from.
-		@param data The raw data received from the client.
-		"""
-
-		try:
-			msg = Command(data)
-			(reg, cb) = handler_map[msg.command]
-
-			if reg == True and not usr.is_registered():
-				usr.send(Message(self._hostname, Reply.ERR.NOTREGISTERED, [
-					'you have not registered'
-				]))
-			elif reg == False and usr.is_registered():
-				usr.send(Message(self._hostname, Reply.ERR.ALREADYREGISTERED, [
-					'unauthorized command (already registered)'
-				]))
-
-			else:
-				cb(self, usr, *msg.arguments)
-
-		except KeyError:
-			usr.send(Message(self._hostname, Reply.ERR.UNKNOWNCOMMAND, [
-				msg.command, 'unknown command'
-			]))
+			Thread(target = usr.listen, args = (callback,)).start()
 
 	def get_user(self, n):
 		try:

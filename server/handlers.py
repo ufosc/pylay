@@ -5,6 +5,22 @@ from common.reply import Reply
 from common.command import Command
 from common.error import NicknameError
 
+def check_state(serv, usr, state):
+	if state == True and not usr.is_registered():
+		usr.send(Message(serv.hostname, Reply.ERR.NOTREGISTERED, [
+			'you have not registered'
+		]))
+		return False
+
+	elif state == False and usr.is_registered():
+		usr.send(Message(serv.hostname, Reply.ERR.ALREADYREGISTERED, [
+			'unauthorized command (already registered)'
+		]))
+		return False
+
+	else:
+		return True
+
 def quit(serv, usr):
 	serv.remove_user(usr)
 
@@ -50,3 +66,8 @@ handler_map = {
 	Command.USER:    (False, user),
 	Command.PRIVMSG: (True,  privmsg)
 }
+
+def unknown_handler(serv, usr, state):
+	usr.send(Message(serv.hostname, Reply.ERR.UNKNOWNCOMMAND, [
+		msg.command, 'unknown command'
+	]))
