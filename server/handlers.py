@@ -64,7 +64,9 @@ def privmsg(serv, usr, n, m):
 	try:
 		chan = serv.get_channel(n)
 		us = serv.get_channel_users(chan)
-		targets = [u for u in us if u != usr]
+
+		targets = us[:]
+		targets.remove(usr)
 
 		for t in targets:
 			t.send(Message(usr.hostmask, Command.PRIVMSG, [n, m]))
@@ -81,6 +83,11 @@ def privmsg(serv, usr, n, m):
 	except NoChannelError:
 		usr.send(Message(serv.hostname, Reply.ERR.NOSUCHCHANNEL, [
 			n, 'no such channel'
+		]))
+
+	except ValueError:
+		usr.send(Message(serv.hostname, Reply.ERR.CANNOTSENDTOCHAN, [
+			n, 'cannot send to channel'
 		]))
 
 def part(serv, usr, n):

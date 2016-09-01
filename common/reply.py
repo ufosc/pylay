@@ -32,8 +32,9 @@ class Reply(Message):
 		NOTREGISTERED     = 451
 		ALREADYREGISTERED = 462
 
-		NOSUCHCHANNEL = 403
-		NOTONCHANNEL  = 442
+		NOSUCHCHANNEL    = 403
+		CANNOTSENDTOCHAN = 404
+		NOTONCHANNEL     = 442
 
 	def __init__(self, raw):
 		"""
