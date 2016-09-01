@@ -98,7 +98,7 @@ def part(serv, usr, n):
 		]))
 
 	except NotInChannelError:
-		usr.send(Message(serv.hostname, Reply.ERR.NOSUCHCHANNEL, [
+		usr.send(Message(serv.hostname, Reply.ERR.NOTONCHANNEL, [
 			n, 'you\'re not on that channel'
 		]))
 
