@@ -77,7 +77,10 @@ class Server:
 		"""
 
 		# The server needs to remove the user instead of just calling die to
-		# make sure a dead user does not remain in the user list
+		# make sure a dead user does not remain in the user and channel lists
+		for c in self._users[usr]:
+			self._channels[c].remove(usr)
+
 		self._users.pop(usr)
 		# Will stop the listen loop and close the connection, ending the thread
 		usr.die()
@@ -156,3 +159,7 @@ class Server:
 	@property
 	def hostname(self):
 		return self._hostname
+
+	@property
+	def users(self):
+		return self._users.keys()

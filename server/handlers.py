@@ -3,7 +3,7 @@ from server.error import NoUserError, NoChannelError, NotInChannelError
 from common.message import Message
 from common.reply import Reply
 from common.command import Command
-from common.error import BadNicknameError, BadChannelError
+from common.error import BadHostmaskError, BadNicknameError, BadChannelError
 
 def check_state(serv, usr, state):
 	if state == True and not usr.is_registered():
@@ -21,8 +21,15 @@ def check_state(serv, usr, state):
 	else:
 		return True
 
-def quit(serv, usr):
+def quit(serv, usr, m = None):
+	hm = usr.hostmask
 	serv.remove_user(usr)
+
+	if not hm.is_valid():
+		return
+
+	for u in serv.users:
+		u.send(Message(hm, Command.QUIT, [m if m else hm.nickname]))
 
 def nick(serv, usr, n):
 	try:
