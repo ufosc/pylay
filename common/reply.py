@@ -33,6 +33,7 @@ class Reply(Message):
 		ALREADYREGISTERED = 462
 
 		NOSUCHCHANNEL = 403
+		NOTONCHANNEL  = 442
 
 	def __init__(self, raw):
 		"""

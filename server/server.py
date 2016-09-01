@@ -2,7 +2,7 @@ import socket
 from threading import Thread
 
 from server.user import User
-from server.error import NoUserError, NoChannelError
+from server.error import NoUserError, NoChannelError, NotInChannelError
 from common.command import Command
 from common.reply import Reply
 from common.channel import Channel
@@ -82,7 +82,7 @@ class Server:
 		# Will stop the listen loop and close the connection, ending the thread
 		usr.die()
 
-	def get_channel(self, n):
+	def get_channel(self, n, create = False):
 		"""
 		Get the channel with the given (fully-qualified) name.
 
@@ -96,11 +96,14 @@ class Server:
 			return next(c for c in cs if format(c) == n)
 
 		except StopIteration:
-			# When no channel is found, it is automatically created
+			# When no channel is found, it is automatically created (maybe)
+			# Always try to create it, to raise BadChannelError
 			c = Channel.from_raw(n)
+			if create == False:
+				raise NoChannelError from None
+
 			# The channel starts out with no users
 			self._channels[c] = []
-
 			return c
 
 	def get_channel_users(self, chan):
@@ -126,9 +129,20 @@ class Server:
 
 		if chan not in self._channels:
 			self._channels[chan] = []
+		if usr in self._channels[chan]:
+			return
 
 		self._channels[chan].append(usr)
 		self._users[usr].append(chan)
+
+	def part_channel(self, chan, usr):
+		if chan not in self._channels:
+			raise NoChannelError
+		if chan not in self._users[usr]:
+			raise NotInChannelError
+
+		self._channels[chan].remove(usr)
+		self._users[usr].remove(chan)
 
 	@property
 	def hostname(self):

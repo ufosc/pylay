@@ -3,3 +3,6 @@ class NoUserError(Exception):
 
 class NoChannelError(Exception):
 	pass
+
+class NotInChannelError(Exception):
+	pass

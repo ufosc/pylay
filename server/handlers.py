@@ -1,5 +1,5 @@
 from server.user import User
-from server.error import NoUserError, NoChannelError
+from server.error import NoUserError, NoChannelError, NotInChannelError
 from common.message import Message
 from common.reply import Reply
 from common.command import Command
@@ -53,7 +53,7 @@ def user(serv, usr, n, h, s, r):
 
 def join(serv, usr, n):
 	try:
-		chan = serv.get_channel(n)
+		chan = serv.get_channel(n, True)
 		serv.join_channel(chan, usr)
 	except BadChannelError:
 		usr.send(Message(serv.hostname, Reply.ERR.NOSUCHCHANNEL, [
@@ -70,20 +70,45 @@ def privmsg(serv, usr, n, m):
 			t.send(Message(usr.hostmask, Command.PRIVMSG, [n, m]))
 
 	except BadChannelError:
-		target = serv.get_user(n)
-		target.send(Message(usr.hostmask, Command.PRIVMSG, [n, m]))
+		try:
+			target = serv.get_user(n)
+			target.send(Message(usr.hostmask, Command.PRIVMSG, [n, m]))
+		except NoUserError:
+			usr.send(Message(serv.hostname, Reply.ERR.NOSUCHNICK, [
+				n, 'no such nick'
+			]))
 
 	except NoChannelError:
 		usr.send(Message(serv.hostname, Reply.ERR.NOSUCHCHANNEL, [
 			n, 'no such channel'
 		]))
 
+def part(serv, usr, n):
+	try:
+		chan = serv.get_channel(n)
+		serv.part_channel(chan, usr)
+
+		targets = serv.get_channel_users(chan)
+		for t in targets:
+			t.send(Message(usr.hostmask, Command.PART, [n]))
+
+	except (BadChannelError, NoChannelError):
+		usr.send(Message(serv.hostname, Reply.ERR.NOSUCHCHANNEL, [
+			n, 'no such channel'
+		]))
+
+	except NotInChannelError:
+		usr.send(Message(serv.hostname, Reply.ERR.NOSUCHCHANNEL, [
+			n, 'you\'re not on that channel'
+		]))
+
 handler_map = {
 	Command.QUIT:    (None,  quit),
 	Command.NICK:    (None,  nick),
 	Command.USER:    (False, user),
+	Command.JOIN:    (True,  join),
 	Command.PRIVMSG: (True,  privmsg),
-	Command.JOIN:    (True,  join)
+	Command.PART:    (True,  part),
 }
 
 def unknown_handler(serv, usr, cmd):
