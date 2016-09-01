@@ -87,6 +87,8 @@ class Server:
 		Get the channel with the given (fully-qualified) name.
 
 		@param n The name of the channel to search for.
+		@param create Specify whether the channel should be created if it
+		              does not exist. Otherwise, raise NoChannelError.
 		@return The retrieved channel.
 		"""
 
@@ -124,7 +126,7 @@ class Server:
 		Add to the list of joined users for a channel.
 
 		@param chan The target channel.
-		@param usr The usr trying to join.
+		@param usr The user trying to join.
 		"""
 
 		if chan not in self._channels:
@@ -136,6 +138,13 @@ class Server:
 		self._users[usr].append(chan)
 
 	def part_channel(self, chan, usr):
+		"""
+		Remove a user from the list of users of a channel.
+
+		@param chan The target channel.
+		@param usr The user trying to part.
+		"""
+
 		if chan not in self._channels:
 			raise NoChannelError
 		if chan not in self._users[usr]:
