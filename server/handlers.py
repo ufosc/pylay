@@ -62,6 +62,15 @@ def join(serv, usr, n):
 	try:
 		chan = serv.get_channel(n, True)
 		serv.join_channel(chan, usr)
+
+		us = serv.get_channel_users(chan)
+
+		targets = us[:]
+		targets.remove(usr)
+
+		for t in targets:
+			t.send(Message(usr.hostmask, Command.JOIN, [n]))
+
 	except BadChannelError:
 		usr.send(Message(serv.hostname, Reply.ERR.NOSUCHCHANNEL, [
 			n, 'no such channel'
