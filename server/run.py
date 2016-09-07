@@ -12,6 +12,9 @@ def handle_message(serv, usr, data):
 		if check_state(serv, usr, state):
 			handler(serv, usr, *msg.arguments)
 
+	except ValueError:
+		pass
+
 	except KeyError:
 		unknown_handler(serv, usr, msg.command)
 
