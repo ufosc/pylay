@@ -5,7 +5,7 @@ from common.reply import Reply
 from common.command import Command
 from common.error import BadHostmaskError, BadNicknameError, BadChannelError
 
-def check_state(serv, usr, state):
+def check_state(serv, usr, state, *_):
 	if state == True and not usr.is_registered():
 		usr.send(Message(serv.hostname, Reply.ERR.NOTREGISTERED, [
 			'you have not registered'
@@ -21,7 +21,7 @@ def check_state(serv, usr, state):
 	else:
 		return True
 
-def quit(serv, usr, m = None):
+def quit(serv, usr, m = None, *_):
 	hm = usr.hostmask
 	serv.remove_user(usr)
 
@@ -31,7 +31,7 @@ def quit(serv, usr, m = None):
 	for u in serv.users:
 		u.send(Message(hm, Command.QUIT, [m if m else hm.nickname]))
 
-def nick(serv, usr, n):
+def nick(serv, usr, n, *_):
 	try:
 		serv.get_user(n)
 		usr.send(Message(serv.hostname, Reply.ERR.NICKNAMEINUSE, [
@@ -50,7 +50,7 @@ def nick(serv, usr, n):
 				n, 'erroneous nickname'
 			]))
 
-def user(serv, usr, n, h, s, r):
+def user(serv, usr, n, h, s, r, *_):
 	usr.update(username = n)
 	if usr.can_register():
 		usr.register()
@@ -58,7 +58,7 @@ def user(serv, usr, n, h, s, r):
 			'welcome to pylay IRC ' + format(usr.hostmask)
 		]))
 
-def join(serv, usr, n):
+def join(serv, usr, n, *_):
 	try:
 		chan = serv.get_channel(n, True)
 		serv.join_channel(chan, usr)
@@ -76,7 +76,7 @@ def join(serv, usr, n):
 			n, 'no such channel'
 		]))
 
-def privmsg(serv, usr, n, m):
+def privmsg(serv, usr, n, m, *_):
 	try:
 		chan = serv.get_channel(n)
 		us = serv.get_channel_users(chan)
@@ -106,7 +106,7 @@ def privmsg(serv, usr, n, m):
 			n, 'cannot send to channel'
 		]))
 
-def part(serv, usr, n):
+def part(serv, usr, n, *_):
 	try:
 		chan = serv.get_channel(n)
 		serv.part_channel(chan, usr)
@@ -137,4 +137,9 @@ handler_map = {
 def unknown_handler(serv, usr, cmd):
 	usr.send(Message(serv.hostname, Reply.ERR.UNKNOWNCOMMAND, [
 		cmd, 'unknown command'
+	]))
+
+def invalid_handler(serv, usr, cmd):
+	usr.send(Message(serv.hostname, Reply.ERR.NEEDMOREPARAMS, [
+		cmd, 'not enough parameters'
 	]))
