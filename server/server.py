@@ -65,14 +65,16 @@ class Server:
 		try:
 			us  = self._users.keys()
 			usr = next(u for u in us if u.hostmask.nickname == n)
+			assert usr.alive
+
+			return usr
+
 		except StopIteration:
 			raise NoUserError from None
 
-		if not usr.alive:
+		except AssertionError:
 			self.remove_user(usr)
-			raise NoUserError
-
-		return usr
+			raise NoUserError from None
 
 	def remove_user(self, usr):
 		"""

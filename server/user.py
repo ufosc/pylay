@@ -51,11 +51,14 @@ class User:
 
 		while self._alive:
 			# 512 is the maximum IRC message size, and always is encoded ASCII
-			data = self._connection.recv(512).decode('ascii')
-			if data:
+			try:
+				data = self._connection.recv(512).decode('ascii')
+				assert data
+
 				callback(self, data)
-			else:
-				self._alive = False
+
+			except (UnicodeDecodeError, AssertionError):
+				self.die()
 
 		# Once dead, close the connection and finish off this user
 		self._connection.close()
@@ -68,8 +71,11 @@ class User:
 		@param msg A message object to send.
 		"""
 
-		data = format(msg)
-		self._connection.sendall(bytes(data, 'ascii'))
+		try:
+			data = format(msg)
+			self._connection.sendall(bytes(data, 'ascii'))
+		except UnicodeDecodeError:
+			self.die()
 
 	def is_registered(self):
 		"""
