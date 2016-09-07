@@ -52,7 +52,10 @@ class User:
 		while self._alive:
 			# 512 is the maximum IRC message size, and always is encoded ASCII
 			data = self._connection.recv(512).decode('ascii')
-			callback(self, data)
+			if data:
+				callback(self, data)
+			else:
+				self._alive = False
 
 		# Once dead, close the connection and finish off this user
 		self._connection.close()
@@ -111,6 +114,10 @@ class User:
 
 		# The thread will actually die the next time the listen loop runs
 		self._alive = False
+
+	@property
+	def alive(self):
+		return self._alive
 
 	@property
 	def hostmask(self):
