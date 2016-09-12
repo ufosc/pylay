@@ -23,13 +23,14 @@ def check_state(serv, usr, state, *_):
 
 def quit(serv, usr, m = None, *_):
 	hm = usr.hostmask
-	serv.remove_user(usr)
-
 	if not hm.is_valid():
 		return
 
-	for u in serv.users:
+	us = (u for u in serv.users if u != usr)
+	for u in us:
 		u.send(Message(hm, Command.QUIT, [m if m else hm.nickname]))
+
+	serv.remove_user(usr)
 
 def nick(serv, usr, n, *_):
 	try:
